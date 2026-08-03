@@ -6,7 +6,7 @@ class EurojackpotService
 {
     public function run()
     {
-        $folderPath = storage_path('app/files');
+        $folderPath = storage_path('stats/euro');
         if (!is_dir($folderPath)) {
             $this->error("Directory not found: {$folderPath}");
             return 1;
