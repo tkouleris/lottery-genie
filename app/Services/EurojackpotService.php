@@ -2,14 +2,22 @@
 
 namespace App\Services;
 
+use Exception;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 class EurojackpotService
 {
-    public function run()
+    /**
+     * @return array[]
+     * @throws FileNotFoundException
+     */
+    public function run($folder = 'stats/euro'): array
     {
-        $folderPath = storage_path('stats/euro');
+        $folderPath = storage_path($folder);
         if (!is_dir($folderPath)) {
-            $this->error("Directory not found: {$folderPath}");
-            return 1;
+            throw new FileNotFoundException("Directory not found: {$folderPath}");
         }
 
         // Use PhpSpreadsheet to read .xlsx files
@@ -18,7 +26,7 @@ class EurojackpotService
 
         foreach ($files as $file) {
             try {
-                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+                $spreadsheet = IOFactory::load($file);
                 $worksheet = $spreadsheet->getActiveSheet();
                 $rows = $worksheet->toArray();
 
@@ -34,13 +42,13 @@ class EurojackpotService
                         $finalStatistics[] = array_map('intval', array_values($data));
                     }
                 }
-            } catch (\Exception $e) {
-                $this->error("Error reading file {$file}: " . $e->getMessage());
+            } catch (Exception $e) {
+                Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
 
         if (empty($finalStatistics)) {
-            $this->warn("No data found in {$folderPath}. Using empty dataset.");
+            throw new Exception("No data found in {$folderPath}. Using empty dataset.");
         }
 
         $jokerIndex1 = 5;
