@@ -59,7 +59,6 @@ class EurojackpotService
         $totalEven = array_fill(0, 6, 0);
         $jokerEven = array_fill(0, 3, 0);
         $jokerSums = [];
-        $diffStats = [];
         $avgStats = [];
 
         foreach ($finalStatistics as $draw) {
@@ -73,9 +72,6 @@ class EurojackpotService
             $tmp = array_slice($draw, 0, 5);
             sort($tmp);
             if (count($tmp) === 5) {
-                $diff = $tmp[4] - $tmp[0];
-                $diffStats[$diff] = ($diffStats[$diff] ?? 0) + 1;
-
                 $evens = count(array_filter($tmp, fn($n) => $n % 2 === 0));
                 $totalEven[$evens]++;
 
@@ -108,20 +104,11 @@ class EurojackpotService
         arsort($avgStats);
         $maxAvgValues = array_slice(array_keys($avgStats), 0, 1);
 
-        arsort($diffStats);
-        $maxDiffValues = array_slice(array_keys($diffStats), 0, (int)(count($diffStats) / 2));
-
         $avgPool = [];
         foreach ($avgStats as $key => $value) {
             $avgPool = array_merge($avgPool, array_fill(0, $value, $key));
         }
         shuffle($avgPool);
-
-        $diffPool = [];
-        foreach ($diffStats as $key => $value) {
-            $diffPool = array_merge($diffPool, array_fill(0, $value, $key));
-        }
-        shuffle($diffPool);
 
         $jokerStats = [];
         foreach ($joker as $key => $value) {
@@ -169,12 +156,6 @@ class EurojackpotService
                 $evens = count(array_filter($currentNumbers, fn($n) => $n % 2 === 0));
                 $evenNumbersPick = $totalEvenStats[array_rand($totalEvenStats)];
                 if ($evens !== $evenNumbersPick) {
-                    continue;
-                }
-
-                $diff = $currentNumbers[4] - $currentNumbers[0];
-                $diffPick = $diffPool[array_rand($diffPool)];
-                if ($diff !== $diffPick) {
                     continue;
                 }
 
@@ -243,12 +224,6 @@ class EurojackpotService
         sort($finalJokers1);
         $finalJokers2 = array_slice($topJokers, 2, 2);
         sort($finalJokers2);
-
-        $diff1 = $finalNumbers1[4] - $finalNumbers1[0];
-        $validDiff1 = in_array($diff1, $maxDiffValues);
-
-        $diff2 = $finalNumbers2[4] - $finalNumbers2[0];
-        $validDiff2 = in_array($diff2, $maxDiffValues);
 
         $evens1 = count(array_filter($finalNumbers1, fn($n) => $n % 2 === 0));
         $validEven1 = in_array($evens1, $maxEvenValues);
