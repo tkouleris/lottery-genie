@@ -31,15 +31,12 @@
 <body class="text-white flex flex-col items-center justify-center p-6">
     <div class="max-w-4xl w-full">
         <header class="text-center mb-12">
-            <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" >
+            <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
             <p class="text-slate-400 text-lg">Your lucky predictions for the next draw</p>
         </header>
 
-        <div class="grid gap-8 md:grid-cols-2">
+        <div class="grid gap-8 md:grid-cols-1">
             <div class="card-glass rounded-3xl p-8 transform transition hover:scale-105 duration-300">
-{{--                <h2 class="text-2xl font-semibold mb-6 text-slate-300 border-b border-white/10 pb-2">--}}
-{{--                    Prediction #{{ $index + 1 }}--}}
-{{--                </h2>--}}
 
                 <div class="flex flex-wrap gap-4 mb-8 justify-center">
                     @foreach($draws[0]['numbers'] as $number)

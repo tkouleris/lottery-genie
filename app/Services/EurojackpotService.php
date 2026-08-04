@@ -239,14 +239,8 @@ class EurojackpotService
 
 
         return [
-            [
-                'numbers' => $finalNumbers1,
-                'jokers' => $finalJokers1,
-            ],
-            [
-                'numbers' => $finalNumbers2,
-                'jokers' => $finalJokers2,
-            ]
+            'numbers' => $finalNumbers1,
+            'jokers' => $finalJokers1,
         ];
     }
 

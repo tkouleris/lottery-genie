@@ -9,7 +9,8 @@ class MainController extends Controller
 {
     public function index(EurojackpotService $eurojackpotService)
     {
-        $draws = $eurojackpotService->run();
+        $draws = [];
+        $draws[] = $eurojackpotService->run();
 
         return view('main', compact('draws'));
     }
