@@ -56,7 +56,6 @@ class EurojackpotService
 
         $joker = array_fill(1, 12, 0);
         $number = array_fill(1, 50, 0);
-        $sumStats = [];
         $totalEven = array_fill(0, 6, 0);
         $jokerEven = array_fill(0, 3, 0);
         $jokerSums = [];
@@ -84,8 +83,6 @@ class EurojackpotService
                 $avgIndex = (int)(floor(($drawSum / 5) / 10) * 10);
                 $avgStats[$avgIndex] = ($avgStats[$avgIndex] ?? 0) + 1;
 
-
-                $sumStats[$drawSum] = ($sumStats[$drawSum] ?? 0) + 1;
             }
 
             if (isset($draw[$jokerIndex1])) {
@@ -150,9 +147,6 @@ class EurojackpotService
         }
         shuffle($jokerEvenStats);
 
-        arsort($sumStats);
-        $allowedSums = array_slice(array_keys($sumStats), 0, 10);
-
         arsort($jokerSums);
         $allowedJokerSums = array_slice(array_keys($jokerSums), 0, (int)(count($jokerSums) / 2));
         $draws = [];
@@ -171,10 +165,6 @@ class EurojackpotService
                     }
                 }
                 sort($currentNumbers);
-
-                if (!in_array(array_sum($currentNumbers), $allowedSums)) {
-                    continue;
-                }
 
                 $evens = count(array_filter($currentNumbers, fn($n) => $n % 2 === 0));
                 $evenNumbersPick = $totalEvenStats[array_rand($totalEvenStats)];
@@ -253,9 +243,6 @@ class EurojackpotService
         sort($finalJokers1);
         $finalJokers2 = array_slice($topJokers, 2, 2);
         sort($finalJokers2);
-
-        $validSum1 = in_array(array_sum($finalNumbers1), $allowedSums);
-        $validSum2 = in_array(array_sum($finalNumbers2), $allowedSums);
 
         $diff1 = $finalNumbers1[4] - $finalNumbers1[0];
         $validDiff1 = in_array($diff1, $maxDiffValues);
