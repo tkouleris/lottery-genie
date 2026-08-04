@@ -62,7 +62,6 @@ class EurojackpotService
         $jokerSums = [];
         $diffStats = [];
         $avgStats = [];
-        $medianStats = [];
 
         foreach ($finalStatistics as $draw) {
 
@@ -85,9 +84,6 @@ class EurojackpotService
                 $avgIndex = (int)(floor(($drawSum / 5) / 10) * 10);
                 $avgStats[$avgIndex] = ($avgStats[$avgIndex] ?? 0) + 1;
 
-                $medianVal = $this->median($tmp);
-                $medianIndex = (int)(floor($medianVal / 10) * 10);
-                $medianStats[$medianIndex] = ($medianStats[$medianIndex] ?? 0) + 1;
 
                 $sumStats[$drawSum] = ($sumStats[$drawSum] ?? 0) + 1;
             }
@@ -112,9 +108,6 @@ class EurojackpotService
         arsort($totalEven);
         $maxEvenValues = array_slice(array_keys($totalEven), 0, 2);
 
-        arsort($medianStats);
-        $maxMedianValues = array_slice(array_keys($medianStats), 0, 3);
-
         arsort($avgStats);
         $maxAvgValues = array_slice(array_keys($avgStats), 0, 1);
 
@@ -126,12 +119,6 @@ class EurojackpotService
             $avgPool = array_merge($avgPool, array_fill(0, $value, $key));
         }
         shuffle($avgPool);
-
-        $medianPool = [];
-        foreach ($medianStats as $key => $value) {
-            $medianPool = array_merge($medianPool, array_fill(0, $value, $key));
-        }
-        shuffle($medianPool);
 
         $diffPool = [];
         foreach ($diffStats as $key => $value) {
@@ -207,11 +194,7 @@ class EurojackpotService
                     continue;
                 }
 
-                $medianValue = (int)(floor($this->median($currentNumbers) / 10) * 10);
-                $medianPick = $medianPool[array_rand($medianPool)];
-                if ($medianValue !== $medianPick) {
-                    continue;
-                }
+
 
                 $draw['numbers'] = $currentNumbers;
             }
@@ -292,31 +275,15 @@ class EurojackpotService
         $avg2 = (int)(floor((array_sum($finalNumbers2) / 5) / 10) * 10);
         $validAvg2 = in_array($avg2, $maxAvgValues);
 
-        $median1 = (int)(floor($this->median($finalNumbers1) / 10) * 10);
-        $validMedian1 = in_array($median1, $maxMedianValues);
-
-        $median2 = (int)(floor($this->median($finalNumbers2) / 10) * 10);
-        $validMedian2 = in_array($median2, $maxMedianValues);
-
 
         return [
             [
                 'numbers' => $finalNumbers1,
                 'jokers' => $finalJokers1,
-//                'valid_diff' => $validDiff1,
-//                'valid_sum' => $validSum1,
-//                'valid_even' => $validEven1,
-//                'valid_avg' => $validAvg1,
-//                'median' => $validMedian1
             ],
             [
                 'numbers' => $finalNumbers2,
                 'jokers' => $finalJokers2,
-//                'valid_diff' => $validDiff2,
-//                'valid_sum' => $validSum2,
-//                'valid_even' => $validEven2,
-//                'valid_avg' => $validAvg2,
-//                'median' => $validMedian2
             ]
         ];
     }
