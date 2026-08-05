@@ -100,13 +100,6 @@ class EurojackpotService
         }
         shuffle($stats);
 
-
-        $jokerEvenStats = [];
-        foreach ($jokerEven as $key => $value) {
-            $jokerEvenStats = array_merge($jokerEvenStats, array_fill(0, $value, $key));
-        }
-        shuffle($jokerEvenStats);
-
         arsort($jokerSums);
         $allowedJokerSums = array_slice(array_keys($jokerSums), 0, (int)(count($jokerSums) / 2));
         $draws = [];
@@ -140,15 +133,6 @@ class EurojackpotService
                 sort($currentJokers);
 
                 if (!in_array(array_sum($currentJokers), $allowedJokerSums)) {
-                    continue;
-                }
-
-                $jokerEvenNumberPick = $jokerEvenStats[array_rand($jokerEvenStats)];
-                $jokerEvens = count(array_filter($currentJokers, fn($n) => $n % 2 === 0));
-
-                if ($jokerEvens !== $jokerEvenNumberPick) {
-                    // Python code had a bug here: draw['numbers'] = [] instead of draw['joker'] = []
-                    // I will fix it to be consistent with the while loop condition
                     continue;
                 }
 
