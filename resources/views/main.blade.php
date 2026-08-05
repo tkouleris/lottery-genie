@@ -16,10 +16,10 @@
             box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3), 5px 5px 15px rgba(0,0,0,0.2);
         }
         .joker-ball {
-            background: linear-gradient(135deg, #fbbf24, #d97706);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         }
         .number-ball {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            background: linear-gradient(135deg, #fbbf24, #d97706);
         }
         .card-glass {
             background: rgba(255, 255, 255, 0.05);
@@ -44,9 +44,6 @@
                             {{ $number }}
                         </div>
                     @endforeach
-                </div>
-
-                <div class="flex flex-wrap gap-4 justify-center">
                     @foreach($draws[0]['jokers'] as $joker)
                         <div class="ball joker-ball w-12 h-12 flex items-center justify-center rounded-full text-xl font-bold text-slate-900">
                             {{ $joker }}
