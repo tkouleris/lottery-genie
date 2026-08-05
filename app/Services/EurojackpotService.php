@@ -177,28 +177,22 @@ class EurojackpotService
 
         arsort($statisticsNumbers);
         $topNumbers = array_slice(array_keys($statisticsNumbers), 0, 10);
-        $finalNumbers1 = array_slice($topNumbers, 0, 5);
-        sort($finalNumbers1);
-        $finalNumbers2 = array_slice($topNumbers, 5, 5);
-        sort($finalNumbers2);
+        $finalNumbers = array_slice($topNumbers, 0, 5);
+        sort($finalNumbers);
 
         arsort($statisticsJoker);
         $topJokers = array_slice(array_keys($statisticsJoker), 0, 4);
-        $finalJokers1 = array_slice($topJokers, 0, 2);
-        sort($finalJokers1);
-        $finalJokers2 = array_slice($topJokers, 2, 2);
-        sort($finalJokers2);
+        $finalJokers = array_slice($topJokers, 0, 2);
+        sort($finalJokers);
 
-        $evens1 = count(array_filter($finalNumbers1, fn($n) => $n % 2 === 0));
+        $evens1 = count(array_filter($finalNumbers, fn($n) => $n % 2 === 0));
         $validEven1 = in_array($evens1, $maxEvenValues);
 
-        $evens2 = count(array_filter($finalNumbers2, fn($n) => $n % 2 === 0));
-        $validEven2 = in_array($evens2, $maxEvenValues);
 
 
         return [
-            'numbers' => $finalNumbers1,
-            'jokers' => $finalJokers1,
+            'numbers' => $finalNumbers,
+            'jokers' => $finalJokers,
         ];
     }
 
