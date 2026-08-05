@@ -59,7 +59,6 @@ class EurojackpotService
         $totalEven = array_fill(0, 6, 0);
         $jokerEven = array_fill(0, 3, 0);
         $jokerSums = [];
-        $avgStats = [];
 
         foreach ($finalStatistics as $draw) {
 
@@ -67,18 +66,6 @@ class EurojackpotService
                 if (isset($draw[$i])) {
                     $number[$draw[$i]]++;
                 }
-            }
-
-            $tmp = array_slice($draw, 0, 5);
-            sort($tmp);
-            if (count($tmp) === 5) {
-                $evens = count(array_filter($tmp, fn($n) => $n % 2 === 0));
-                $totalEven[$evens]++;
-
-                $drawSum = array_sum($tmp);
-                $avgIndex = (int)(floor(($drawSum / 5) / 10) * 10);
-                $avgStats[$avgIndex] = ($avgStats[$avgIndex] ?? 0) + 1;
-
             }
 
             if (isset($draw[$jokerIndex1])) {
@@ -100,15 +87,6 @@ class EurojackpotService
 
         arsort($totalEven);
         $maxEvenValues = array_slice(array_keys($totalEven), 0, 2);
-
-        arsort($avgStats);
-        $maxAvgValues = array_slice(array_keys($avgStats), 0, 1);
-
-        $avgPool = [];
-        foreach ($avgStats as $key => $value) {
-            $avgPool = array_merge($avgPool, array_fill(0, $value, $key));
-        }
-        shuffle($avgPool);
 
         $jokerStats = [];
         foreach ($joker as $key => $value) {
@@ -152,20 +130,6 @@ class EurojackpotService
                     }
                 }
                 sort($currentNumbers);
-
-                $evens = count(array_filter($currentNumbers, fn($n) => $n % 2 === 0));
-                $evenNumbersPick = $totalEvenStats[array_rand($totalEvenStats)];
-                if ($evens !== $evenNumbersPick) {
-                    continue;
-                }
-
-                $avg = (int)(floor((array_sum($currentNumbers) / 5) / 10) * 10);
-                $avgPick = $avgPool[array_rand($avgPool)];
-                if ($avg !== $avgPick) {
-                    continue;
-                }
-
-
 
                 $draw['numbers'] = $currentNumbers;
             }
@@ -231,12 +195,6 @@ class EurojackpotService
         $evens2 = count(array_filter($finalNumbers2, fn($n) => $n % 2 === 0));
         $validEven2 = in_array($evens2, $maxEvenValues);
 
-        $avg1 = (int)(floor((array_sum($finalNumbers1) / 5) / 10) * 10);
-        $validAvg1 = in_array($avg1, $maxAvgValues);
-
-        $avg2 = (int)(floor((array_sum($finalNumbers2) / 5) / 10) * 10);
-        $validAvg2 = in_array($avg2, $maxAvgValues);
-
 
         return [
             'numbers' => $finalNumbers1,
@@ -244,17 +202,4 @@ class EurojackpotService
         ];
     }
 
-    private function median(array $lst): float|int
-    {
-        sort($lst);
-        $n = count($lst);
-        if ($n === 0) return 0;
-        $mid = (int)($n / 2);
-
-        if ($n % 2 === 1) {
-            return $lst[$mid];
-        } else {
-            return ($lst[$mid - 1] + $lst[$mid]) / 2;
-        }
-    }
 }

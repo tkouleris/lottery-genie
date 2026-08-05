@@ -47,7 +47,6 @@
                 </div>
 
                 <div class="flex flex-wrap gap-4 justify-center">
-                    <span class="w-full text-center text-sm text-yellow-400/70 uppercase tracking-widest mb-2 font-semibold">Euro Numbers</span>
                     @foreach($draws[0]['jokers'] as $joker)
                         <div class="ball joker-ball w-12 h-12 flex items-center justify-center rounded-full text-xl font-bold text-slate-900">
                             {{ $joker }}
