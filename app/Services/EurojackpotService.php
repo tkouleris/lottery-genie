@@ -85,8 +85,6 @@ class EurojackpotService
             }
         }
 
-        arsort($totalEven);
-        $maxEvenValues = array_slice(array_keys($totalEven), 0, 2);
 
         $jokerStats = [];
         foreach ($joker as $key => $value) {
@@ -163,10 +161,6 @@ class EurojackpotService
         $topJokers = array_slice(array_keys($statisticsJoker), 0, 4);
         $finalJokers = array_slice($topJokers, 0, 2);
         sort($finalJokers);
-
-        $evens1 = count(array_filter($finalNumbers, fn($n) => $n % 2 === 0));
-        $validEven1 = in_array($evens1, $maxEvenValues);
-
 
 
         return [
