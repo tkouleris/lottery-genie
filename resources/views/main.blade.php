@@ -40,12 +40,12 @@
 
                 <div class="flex flex-wrap gap-4 mb-8 justify-center">
                     @foreach($draws[0]['numbers'] as $number)
-                        <div class="ball number-ball w-12 h-12 flex items-center justify-center rounded-full text-xl font-bold">
+                        <div class="ball number-ball w-12 h-12 flex items-center justify-center rounded-full text-xl font-bold text-slate-900">
                             {{ $number }}
                         </div>
                     @endforeach
                     @foreach($draws[0]['jokers'] as $joker)
-                        <div class="ball joker-ball w-12 h-12 flex items-center justify-center rounded-full text-xl font-bold text-slate-900">
+                        <div class="ball joker-ball w-12 h-12 flex items-center justify-center rounded-full text-xl font-bold">
                             {{ $joker }}
                         </div>
                     @endforeach
