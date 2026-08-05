@@ -100,11 +100,6 @@ class EurojackpotService
         }
         shuffle($stats);
 
-        $totalEvenStats = [];
-        foreach ($totalEven as $key => $value) {
-            $totalEvenStats = array_merge($totalEvenStats, array_fill(0, $value, $key));
-        }
-        shuffle($totalEvenStats);
 
         $jokerEvenStats = [];
         foreach ($jokerEven as $key => $value) {
