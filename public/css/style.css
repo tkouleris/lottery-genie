@@ -1,0 +1,19 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(circle at top left, #1e293b, #0f172a);
+    min-height: 100vh;
+}
+.ball {
+    box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3), 5px 5px 15px rgba(0,0,0,0.2);
+}
+.joker-ball {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+.number-ball {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+.card-glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
