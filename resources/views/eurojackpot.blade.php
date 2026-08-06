@@ -28,7 +28,7 @@
         }
     </style>
 </head>
-<body class="text-white flex flex-col items-center justify-center p-6">
+<body class="text-white flex flex-col items-center p-6">
 <div class="max-w-4xl w-full">
     <header class="text-center mb-12">
         <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
