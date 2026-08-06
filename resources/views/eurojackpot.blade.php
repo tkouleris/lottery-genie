@@ -37,6 +37,7 @@
 
     <form action="{{ route('eurojackpot') }}" method="GET" class="card-glass rounded-3xl p-8 mb-8">
         <div class="flex flex-col items-center gap-6">
+            Select Number of Draws:
             <div class="flex flex-wrap justify-center gap-4">
                 @foreach([1, 2, 3, 4, 5, 6] as $i)
                     <label class="flex items-center gap-2 cursor-pointer group">
