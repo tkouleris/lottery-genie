@@ -34,6 +34,11 @@
         </div>
     </nav>
 
+    <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm hidden">
+        <div class="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-xl font-semibold text-white">Calculating luck...</p>
+    </div>
+
     <div class="max-w-4xl w-full">
         @yield('content')
 
@@ -42,5 +47,17 @@
             <p class="mt-2">&copy; {{ date('Y') }} Lottery Genie</p>
         </footer>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            const overlay = document.getElementById('loading-overlay');
+
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    overlay.classList.remove('hidden');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
