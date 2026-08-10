@@ -25,7 +25,7 @@
     </div>
     <hr/>
     <header class="text-center mb-12"  style="margin-top: 50px">
-        <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
+        <img src="{{ asset('img/tzoker.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
         <p class="text-slate-400 text-lg">Your lucky predictions for the next draw</p>
     </header>
 
