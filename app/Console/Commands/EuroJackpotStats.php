@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\EurojackpotService;
+use App\Services\JokerService;
 use Illuminate\Console\Command;
 
 class EuroJackpotStats extends Command
@@ -26,9 +27,12 @@ class EuroJackpotStats extends Command
      */
     public function handle(): int
     {
-        $obj = resolve(EurojackpotService::class);
+        $obj = resolve(JokerService::class);
         $output = $obj->run();
         dd($output);
+//        $obj = resolve(EurojackpotService::class);
+//        $output = $obj->run();
+//        dd($output);
 //        $folderPath = storage_path('app/files');
 //        if (!is_dir($folderPath)) {
 //            $this->error("Directory not found: {$folderPath}");

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -37,7 +38,7 @@ class JokerService
 
                     // Filter out empty rows and ensure we have enough columns
                     $data = array_filter($row, fn($cell) => $cell !== null);
-                    if (count($data) >= 7) {
+                    if (count($data) >= 6) {
                         $finalStatistics[] = array_map('intval', array_values($data));
                     }
                 }
@@ -50,13 +51,12 @@ class JokerService
             throw new Exception("No data found in {$folderPath}. Using empty dataset.");
         }
 
-        $jokerIndex1 = 5;
-        $jokerIndex2 = 6;
+        $jokerIndex = 5;
 
-        $joker = array_fill(1, 12, 0);
-        $number = array_fill(1, 50, 0);
-        $totalEven = array_fill(0, 6, 0);
-        $jokerEven = array_fill(0, 3, 0);
+        $joker = array_fill(1, 20, 0);
+        $number = array_fill(1, 45, 0);
+//        $totalEven = array_fill(0, 6, 0);
+//        $jokerEven = array_fill(0, 3, 0);
         $jokerSums = [];
 
         foreach ($finalStatistics as $draw) {
@@ -67,21 +67,18 @@ class JokerService
                 }
             }
 
-            if (isset($draw[$jokerIndex1])) {
-                $joker[$draw[$jokerIndex1]]++;
-            }
-            if (isset($draw[$jokerIndex2])) {
-                $joker[$draw[$jokerIndex2]]++;
+            if (isset($draw[$jokerIndex])) {
+                $joker[$draw[$jokerIndex]]++;
             }
 
-            $tmpJokerDraw = array_slice($draw, 5, 2);
-            if (count($tmpJokerDraw) === 2) {
-                $jokerEvens = count(array_filter($tmpJokerDraw, fn($n) => $n % 2 === 0));
-                $jokerEven[$jokerEvens]++;
-
-                $drawJokerSum = array_sum($tmpJokerDraw);
-                $jokerSums[$drawJokerSum] = ($jokerSums[$drawJokerSum] ?? 0) + 1;
-            }
+//            $tmpJokerDraw = array_slice($draw, 5, 2);
+//            if (count($tmpJokerDraw) === 2) {
+//                $jokerEvens = count(array_filter($tmpJokerDraw, fn($n) => $n % 2 === 0));
+//                $jokerEven[$jokerEvens]++;
+//
+//                $drawJokerSum = array_sum($tmpJokerDraw);
+//                $jokerSums[$drawJokerSum] = ($jokerSums[$drawJokerSum] ?? 0) + 1;
+//            }
         }
 
 
@@ -97,8 +94,8 @@ class JokerService
         }
         shuffle($stats);
 
-        arsort($jokerSums);
-        $allowedJokerSums = array_slice(array_keys($jokerSums), 0, (int)(count($jokerSums) / 2));
+//        arsort($jokerSums);
+//        $allowedJokerSums = array_slice(array_keys($jokerSums), 0, (int)(count($jokerSums) / 2));
         $draws = [];
         for ($i = 0; $i < 100; $i++) {
             $draw = [
@@ -121,7 +118,7 @@ class JokerService
 
             while (count($draw['joker']) === 0) {
                 $currentJokers = [];
-                while (count($currentJokers) < 2) {
+                while (count($currentJokers) < 1) {
                     $val = $jokerStats[array_rand($jokerStats)];
                     if (!in_array($val, $currentJokers)) {
                         $currentJokers[] = $val;
@@ -129,18 +126,14 @@ class JokerService
                 }
                 sort($currentJokers);
 
-                if (!in_array(array_sum($currentJokers), $allowedJokerSums)) {
-                    continue;
-                }
-
                 $draw['joker'] = $currentJokers;
             }
 
             $draws[] = $draw;
         }
 
-        $statisticsNumbers = array_fill(1, 50, 0);
-        $statisticsJoker = array_fill(1, 12, 0);
+        $statisticsNumbers = array_fill(1, 45, 0);
+        $statisticsJoker = array_fill(1, 20, 0);
 
         foreach ($draws as $d) {
             foreach ($d['numbers'] as $n) {
@@ -158,7 +151,7 @@ class JokerService
 
         arsort($statisticsJoker);
         $topJokers = array_slice(array_keys($statisticsJoker), 0, 4);
-        $finalJokers = array_slice($topJokers, 0, 2);
+        $finalJokers = array_slice($topJokers, 0, 1);
         sort($finalJokers);
 
 
