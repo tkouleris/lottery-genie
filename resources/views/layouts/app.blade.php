@@ -10,6 +10,15 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
     </style>
 </head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BS7EGERJ29"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-BS7EGERJ29');
+</script>
 <body class="text-white flex flex-col items-center p-6">
     <nav class="max-w-4xl w-full mb-8">
         <div class="card-glass rounded-2xl px-6 py-4 flex justify-between items-center">
