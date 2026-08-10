@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Services\EurojackpotService;
+use App\Services\JokerService;
 use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
-    public function index(EurojackpotService $eurojackpotService)
+    public function index(EurojackpotService $eurojackpotService, JokerService $jokerService)
     {
-        $draws = [];
-        $draws[] = $eurojackpotService->run();
+        $euro = [];
+        $euro[] = $eurojackpotService->run();
 
-        return view('main', compact('draws'));
+        $joker = [];
+        $joker[] = $jokerService->run();
+        return view('main', compact('euro', 'joker'));
     }
 }
