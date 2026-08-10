@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\EurojackpotController;
+use App\Http\Controllers\DrawsController;
 use App\Http\Controllers\MainController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [MainController::class, 'index']);
-Route::get('/eurojackpot', [EurojackpotController::class, 'index'])->name('eurojackpot');
+Route::get('/eurojackpot', [DrawsController::class, 'draw_eurojackpot'])->name('eurojackpot');
+Route::get('/joker', [DrawsController::class, 'draw_joker'])->name('joker');
 Route::get('/about', function () {
     return view('about');
 })->name('about');
