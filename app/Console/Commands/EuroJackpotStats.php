@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\EurojackpotService;
 use App\Services\JokerService;
+use App\Services\LottoService;
 use Illuminate\Console\Command;
 
 class EuroJackpotStats extends Command
@@ -28,9 +29,9 @@ class EuroJackpotStats extends Command
     public function handle(): int
     {
 //        https://media.opap.gr/Excel/5104/Joker_2019.xls?utm_source=chatgpt.com
-//        $obj = resolve(JokerService::class);
-//        $output = $obj->run();
-//        dd($output);
+        $obj = resolve(LottoService::class);
+        $output = $obj->run();
+        dd($output);
         return 0;
     }
 
