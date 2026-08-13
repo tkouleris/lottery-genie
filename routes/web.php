@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [MainController::class, 'index']);
 Route::get('/eurojackpot', [DrawsController::class, 'draw_eurojackpot'])->name('eurojackpot');
 Route::get('/joker', [DrawsController::class, 'draw_joker'])->name('joker');
+Route::get('/lotto', [DrawsController::class, 'draw_lotto'])->name('lotto');
 Route::get('/about', function () {
     return view('about');
 })->name('about');

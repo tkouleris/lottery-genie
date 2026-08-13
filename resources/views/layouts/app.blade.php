@@ -29,6 +29,7 @@
                 <a href="/" class="text-slate-300 hover:text-white transition-colors">Home</a>
                 <a href="{{ route('eurojackpot') }}" class="text-slate-300 hover:text-white transition-colors">Eurojackpot</a>
                 <a href="{{ route('joker') }}" class="text-slate-300 hover:text-white transition-colors">Joker</a>
+                <a href="{{ route('lotto') }}" class="text-slate-300 hover:text-white transition-colors">Lotto</a>
                 <a href="{{ route('about') }}" class="text-slate-300 hover:text-white transition-colors">About</a>
             </div>
         </div>

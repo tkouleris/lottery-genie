@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Joker Numbers')
+@section('title', 'Lotto Numbers')
 
 @section('content')
     <header class="text-center mb-12">
-        <img src="{{ asset('img/tzoker.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
+        <img src="{{ asset('img/lotto.jpg') }}" alt="Lotto Logo" class="mx-auto">
         <p class="text-slate-400 text-lg">Your lucky predictions for the next draw</p>
     </header>
 
-    <form action="{{ route('joker') }}" method="GET" class="card-glass rounded-3xl p-8 mb-8">
+    <form action="{{ route('lotto') }}" method="GET" class="card-glass rounded-3xl p-8 mb-8">
         <div class="flex flex-col items-center gap-6">
             Select Number of Draws:
             <div class="flex flex-wrap justify-center gap-4">
@@ -33,11 +33,6 @@
                     @foreach($draw['numbers'] as $number)
                         <div class="ball number-ball w-12 h-12 flex items-center justify-center rounded-full text-xl font-bold text-slate-900">
                             {{ $number }}
-                        </div>
-                    @endforeach
-                    @foreach($draw['jokers'] as $joker)
-                        <div class="ball joker-ball w-12 h-12 flex items-center justify-center rounded-full text-xl font-bold">
-                            {{ $joker }}
                         </div>
                     @endforeach
                 </div>
