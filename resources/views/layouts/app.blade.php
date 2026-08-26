@@ -23,9 +23,10 @@
     <nav class="max-w-4xl w-full mb-8 px-4 md:px-0">
         <div class="card-glass rounded-2xl px-4 md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-yellow-400 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+                <img src="{{asset('img/small-logo.jpg')}}" />
+{{--                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">--}}
+{{--                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />--}}
+{{--                </svg>--}}
                 Lottery Genie
             </div>
             <div class="flex flex-wrap justify-center gap-4 md:gap-6">
