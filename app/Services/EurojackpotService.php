@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\File;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Log;
@@ -15,13 +16,7 @@ class EurojackpotService
      */
     public function run($folder = 'stats/euro'): array
     {
-        $folderPath = storage_path($folder);
-        if (!is_dir($folderPath)) {
-            throw new FileNotFoundException("Directory not found: {$folderPath}");
-        }
-
-        // Use PhpSpreadsheet to read .xlsx files
-        $files = glob($folderPath . '/*.xlsx');
+        $files = File::load_xlsx_files($folder);
         $finalStatistics = [];
 
         foreach ($files as $file) {
@@ -48,6 +43,7 @@ class EurojackpotService
         }
 
         if (empty($finalStatistics)) {
+            $folderPath = storage_path($folder);
             throw new Exception("No data found in {$folderPath}. Using empty dataset.");
         }
 
