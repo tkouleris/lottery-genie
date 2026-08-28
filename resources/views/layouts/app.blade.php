@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Lottery Genie')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
@@ -31,10 +32,24 @@
             </div>
             <div class="flex flex-wrap justify-center gap-4 md:gap-6">
                 <a href="/" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Home</a>
-                <div class="group relative">
-                    <a href="{{ route('eurojackpot') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Eurojackpot</a>
-                    <div class="absolute hidden group-hover:block w-32 bg-slate-800 rounded-lg shadow-xl z-20 top-full -left-4 mt-2 py-2">
-                        <a href="{{ route('eurojackpot.stats') }}" class="block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-700">Statistics</a>
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" @click.away="open = false" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors flex items-center gap-1">
+                        Eurojackpot
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="open"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute w-40 bg-slate-800/90 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl z-50 top-full left-0 mt-2 py-2"
+                         style="display: none;">
+                        <a href="{{ route('eurojackpot') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Predict</a>
+                        <a href="{{ route('eurojackpot.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Stats</a>
                     </div>
                 </div>
                 <a href="{{ route('joker') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Joker</a>
