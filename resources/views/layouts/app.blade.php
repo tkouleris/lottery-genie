@@ -31,7 +31,12 @@
             </div>
             <div class="flex flex-wrap justify-center gap-4 md:gap-6">
                 <a href="/" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Home</a>
-                <a href="{{ route('eurojackpot') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Eurojackpot</a>
+                <div class="group relative">
+                    <a href="{{ route('eurojackpot') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Eurojackpot</a>
+                    <div class="absolute hidden group-hover:block w-32 bg-slate-800 rounded-lg shadow-xl z-20 top-full -left-4 mt-2 py-2">
+                        <a href="{{ route('eurojackpot.stats') }}" class="block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-700">Statistics</a>
+                    </div>
+                </div>
                 <a href="{{ route('joker') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Joker</a>
                 <a href="{{ route('lotto') }}" class="text-slate-300 hover:text-white transition-colors">Lotto</a>
                 <a href="{{ route('about') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">About</a>

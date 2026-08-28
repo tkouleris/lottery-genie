@@ -6,6 +6,11 @@
     <header class="text-center mb-12">
         <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
         <p class="text-slate-400 text-lg">Your lucky predictions for the next draw</p>
+        <div class="mt-4">
+            <a href="{{ route('eurojackpot.stats') }}" class="text-blue-400 hover:text-blue-300 font-semibold underline decoration-2 underline-offset-4 transition-colors">
+                View Historical Statistics
+            </a>
+        </div>
     </header>
 
     <form action="{{ route('eurojackpot') }}" method="GET" class="card-glass rounded-3xl p-8 mb-8">

@@ -21,6 +21,12 @@ class DrawsController extends Controller
         return view('eurojackpot', compact('draws'));
     }
 
+    public function eurojackpot_stats(EurojackpotService $eurojackpotService)
+    {
+        $stats = $eurojackpotService->get_stats();
+        return view('eurojackpot-stats', compact('stats'));
+    }
+
     public function draw_joker(Request $request, JokerService $jokerService)
     {
         $draws = [];
