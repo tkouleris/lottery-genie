@@ -14,7 +14,7 @@
         <section class="card-glass rounded-3xl p-8">
             <h2 class="text-2xl font-bold mb-6 text-blue-400">Number Frequency (1-50)</h2>
             <div class="grid grid-cols-5 md:grid-cols-10 gap-4">
-                @foreach(collect($stats['number_frequency'])->sortKeys() as $num => $count)
+                @foreach($stats['number_frequency'] as $num => $count)
                     <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
                         <div class="ball number-ball w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold text-slate-900 mb-1">
                             {{ $num }}
@@ -30,7 +30,7 @@
             <section class="card-glass rounded-3xl p-8">
                 <h2 class="text-2xl font-bold mb-6 text-yellow-400">Joker Frequency (1-12)</h2>
                 <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
-                    @foreach(collect($stats['joker_frequency'])->sortKeys() as $num => $count)
+                    @foreach($stats['joker_frequency'] as $num => $count)
                         <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
                             <div class="ball joker-ball w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold mb-1">
                                 {{ $num }}
