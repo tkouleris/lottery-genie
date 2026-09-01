@@ -4,7 +4,7 @@
 
 @section('content')
     <header class="text-center mb-12">
-        <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
+        <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto" style="max-height: 150px;">
         <h1 class="text-3xl font-bold mt-4">Eurojackpot Statistics</h1>
         <p class="text-slate-400 text-lg">Historical data analysis ({{ $stats['total_draws_analyzed'] }} draws)</p>
     </header>

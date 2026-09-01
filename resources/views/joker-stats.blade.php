@@ -4,9 +4,9 @@
 
 @section('content')
     <header class="text-center mb-12">
-        <img src="{{ asset('img/joker.jpg') }}" alt="Joker Logo" class="mx-auto" style="max-height: 150px;">
+        <img src="{{ asset('img/tzoker.jpg') }}" alt="Joker Logo" class="mx-auto" style="max-height: 150px;">
         <h1 class="text-3xl font-bold mt-4">Joker Statistics</h1>
-        <p class="text-slate-400 text-lg">Historical data analysis from XLSX files</p>
+        <p class="text-slate-400 text-lg">Historical data analysis ({{ $stats['total_draws_analyzed'] }} draws)</p>
     </header>
 
     <div class="space-y-8">

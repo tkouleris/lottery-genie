@@ -63,6 +63,7 @@ class JokerService
         $medians = [];
         $jokers = [];
         $combinations = [];
+        $totalDraws = count($draws);
 
         foreach ($draws as $draw) {
             $numbers = $draw['numbers']; // Ήδη ταξινομημένα
@@ -92,6 +93,7 @@ class JokerService
             'top_medians' => array_slice($medians, 0, 10, true),
             'top_jokers' => array_slice($jokers, 0, 10, true),
             'top_combinations' => array_slice($combinations, 0, 10, true),
+            'total_draws_analyzed' => $totalDraws,
         ];
     }
 

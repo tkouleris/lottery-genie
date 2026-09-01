@@ -32,6 +32,8 @@ class JokerStatsCalculator extends Command
         try {
             $stats = $service->getStats();
 
+            $this->info("Αναλύθηκαν {$stats['total_draws_analyzed']} κληρώσεις.");
+
             $this->newline();
             $this->info('10 Πιο Συχνοί Διάμεσοι (Median)');
             $this->table(['Διάμεσος', 'Συχνότητα'], $this->formatForTable($stats['top_medians']));
