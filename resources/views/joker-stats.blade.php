@@ -25,6 +25,21 @@
             </div>
         </section>
 
+        <!-- Simple Number Frequency -->
+        <section class="card-glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">10 Most Frequent Simple Numbers</h2>
+            <div class="grid grid-cols-5 md:grid-cols-10 gap-4">
+                @foreach($stats['top_numbers'] as $num => $count)
+                    <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
+                        <div class="ball number-ball w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold text-slate-900 mb-1">
+                            {{ $num }}
+                        </div>
+                        <span class="text-xs text-slate-400">{{ $count }} times</span>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Joker Frequency -->
             <section class="card-glass rounded-3xl p-8">

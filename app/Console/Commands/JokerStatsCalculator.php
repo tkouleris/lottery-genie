@@ -39,6 +39,10 @@ class JokerStatsCalculator extends Command
             $this->table(['Διάμεσος', 'Συχνότητα'], $this->formatForTable($stats['top_medians']));
 
             $this->newline();
+            $this->info('10 Πιο Συχνά Απλά Νούμερα');
+            $this->table(['Νούμερο', 'Συχνότητα'], $this->formatForTable($stats['top_numbers']));
+
+            $this->newline();
             $this->info('10 Πιο Συχνά Τζόκερ νούμερα');
             $this->table(['Τζόκερ', 'Συχνότητα'], $this->formatForTable($stats['top_jokers']));
 

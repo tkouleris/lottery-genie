@@ -62,6 +62,7 @@ class JokerService
     {
         $medians = [];
         $jokers = [];
+        $numbers_freq = [];
         $combinations = [];
         $totalDraws = count($draws);
 
@@ -76,7 +77,12 @@ class JokerService
             // 2. Τζόκερ
             $jokers[$joker] = ($jokers[$joker] ?? 0) + 1;
 
-            // 3. Συνδυασμοί 3 απλών + Τζόκερ
+            // 3. Απλά νούμερα
+            foreach ($numbers as $num) {
+                $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
+            }
+
+            // 4. Συνδυασμοί 3 απλών + Τζόκερ
             // Παίρνουμε όλους τους συνδυασμούς 3 από τα 5 νούμερα
             $tripleCombos = $this->getCombinations($numbers, 3);
             foreach ($tripleCombos as $combo) {
@@ -87,11 +93,13 @@ class JokerService
 
         arsort($medians);
         arsort($jokers);
+        arsort($numbers_freq);
         arsort($combinations);
 
         return [
             'top_medians' => array_slice($medians, 0, 10, true),
             'top_jokers' => array_slice($jokers, 0, 10, true),
+            'top_numbers' => array_slice($numbers_freq, 0, 10, true),
             'top_combinations' => array_slice($combinations, 0, 10, true),
             'total_draws_analyzed' => $totalDraws,
         ];
