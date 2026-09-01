@@ -25,9 +25,6 @@
         <div class="card-glass rounded-2xl px-4 md:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-yellow-400 flex items-center gap-2">
                 <img src="{{asset('img/small-logo.jpg')}}" />
-{{--                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">--}}
-{{--                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />--}}
-{{--                </svg>--}}
                 Lottery Genie
             </div>
             <div class="flex flex-wrap justify-center gap-4 md:gap-6">
@@ -52,7 +49,26 @@
                         <a href="{{ route('eurojackpot.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Stats</a>
                     </div>
                 </div>
-                <a href="{{ route('joker') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Joker</a>
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" @click.away="open = false" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors flex items-center gap-1">
+                        Joker
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="open"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute w-40 bg-slate-800/90 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl z-50 top-full left-0 mt-2 py-2"
+                         style="display: none;">
+                        <a href="{{ route('joker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Predict</a>
+                        <a href="{{ route('joker.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Stats</a>
+                    </div>
+                </div>
                 <a href="{{ route('lotto') }}" class="text-slate-300 hover:text-white transition-colors">Lotto</a>
                 <a href="{{ route('about') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">About</a>
             </div>

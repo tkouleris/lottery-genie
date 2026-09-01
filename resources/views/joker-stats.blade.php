@@ -1,0 +1,66 @@
+@extends('layouts.app')
+
+@section('title', 'Joker Statistics')
+
+@section('content')
+    <header class="text-center mb-12">
+        <img src="{{ asset('img/joker.jpg') }}" alt="Joker Logo" class="mx-auto" style="max-height: 150px;">
+        <h1 class="text-3xl font-bold mt-4">Joker Statistics</h1>
+        <p class="text-slate-400 text-lg">Historical data analysis from XLSX files</p>
+    </header>
+
+    <div class="space-y-8">
+        <!-- Median Frequency -->
+        <section class="card-glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6 text-blue-400">10 Most Frequent Medians (3rd number)</h2>
+            <div class="grid grid-cols-5 md:grid-cols-10 gap-4">
+                @foreach($stats['top_medians'] as $num => $count)
+                    <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
+                        <div class="ball number-ball w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold text-slate-900 mb-1">
+                            {{ $num }}
+                        </div>
+                        <span class="text-xs text-slate-400">{{ $count }} times</span>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Joker Frequency -->
+            <section class="card-glass rounded-3xl p-8">
+                <h2 class="text-2xl font-bold mb-6 text-yellow-400">10 Most Frequent Jokers</h2>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    @foreach($stats['top_jokers'] as $num => $count)
+                        <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
+                            <div class="ball joker-ball w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold mb-1">
+                                {{ $num }}
+                            </div>
+                            <span class="text-xs text-slate-400">{{ $count }} times</span>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+
+            <!-- Common Joker Combinations -->
+            <section class="card-glass rounded-3xl p-8">
+                <h2 class="text-2xl font-bold mb-6 text-pink-400">Top Combinations (3 Numbers + Joker)</h2>
+                <div class="space-y-4">
+                    @foreach($stats['top_combinations'] as $combo => $count)
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/50">
+                            <div class="text-sm font-bold text-slate-300">
+                                {{ $combo }}
+                            </div>
+                            <span class="font-bold text-slate-300 ml-2 text-xs">{{ $count }} times</span>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="{{ route('joker') }}" class="inline-block px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold hover:from-blue-600 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25">
+            Get Lucky Predictions
+        </a>
+    </div>
+@endsection
