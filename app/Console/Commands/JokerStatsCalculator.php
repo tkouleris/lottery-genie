@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\JokerStatsService;
+use App\Services\JokerService;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -25,7 +25,7 @@ class JokerStatsCalculator extends Command
     /**
      * Execute the console command.
      */
-    public function handle(JokerStatsService $service): int
+    public function handle(JokerService $service): int
     {
         $this->info('Calculating Joker statistics...');
 
