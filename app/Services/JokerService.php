@@ -63,7 +63,7 @@ class JokerService
         $medians = [];
         $jokers = [];
         $numbers_freq = [];
-        $combinations = [];
+        $even_odd_freq = [];
         $totalDraws = count($draws);
 
         foreach ($draws as $draw) {
@@ -82,25 +82,30 @@ class JokerService
                 $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
             }
 
-            // 4. Συνδυασμοί 3 απλών + Τζόκερ
-            // Παίρνουμε όλους τους συνδυασμούς 3 από τα 5 νούμερα
-            $tripleCombos = $this->getCombinations($numbers, 3);
-            foreach ($tripleCombos as $combo) {
-                $key = implode(',', $combo) . ' + [' . $joker . ']';
-                $combinations[$key] = ($combinations[$key] ?? 0) + 1;
+            // 4. Συχνότητα Even / Odd (για τα 5 νούμερα)
+            $evenCount = 0;
+            $oddCount = 0;
+            foreach ($numbers as $num) {
+                if ($num % 2 === 0) {
+                    $evenCount++;
+                } else {
+                    $oddCount++;
+                }
             }
+            $evenOddKey = "{$evenCount} even / {$oddCount} odd";
+            $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
         }
 
         arsort($medians);
         arsort($jokers);
         arsort($numbers_freq);
-        arsort($combinations);
+        arsort($even_odd_freq);
 
         return [
             'top_medians' => array_slice($medians, 0, 10, true),
             'top_jokers' => array_slice($jokers, 0, 10, true),
             'top_numbers' => array_slice($numbers_freq, 0, 10, true),
-            'top_combinations' => array_slice($combinations, 0, 10, true),
+            'even_odd_stats' => $even_odd_freq,
             'total_draws_analyzed' => $totalDraws,
         ];
     }

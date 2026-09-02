@@ -47,8 +47,8 @@ class JokerStatsCalculator extends Command
             $this->table(['Τζόκερ', 'Συχνότητα'], $this->formatForTable($stats['top_jokers']));
 
             $this->newline();
-            $this->info('10 Πιο Συχνοί Συνδυασμοί (3 Απλοί + Τζόκερ)');
-            $this->table(['Συνδυασμός', 'Συχνότητα'], $this->formatForTable($stats['top_combinations']));
+            $this->info('Συχνότητα Συνδυασμών Even / Odd');
+            $this->table(['Συνδυασμός', 'Συχνότητα'], $this->formatForTable($stats['even_odd_stats']));
 
         } catch (Exception $e) {
             $this->error($e->getMessage());

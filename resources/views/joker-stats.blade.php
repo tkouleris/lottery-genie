@@ -56,16 +56,14 @@
                 </div>
             </section>
 
-            <!-- Common Joker Combinations -->
+            <!-- Even / Odd Frequency -->
             <section class="card-glass rounded-3xl p-8">
-                <h2 class="text-2xl font-bold mb-6 text-pink-400">Top Combinations (3 Numbers + Joker)</h2>
+                <h2 class="text-2xl font-bold mb-6 text-yellow-400">Even / Odd Combinations</h2>
                 <div class="space-y-4">
-                    @foreach($stats['top_combinations'] as $combo => $count)
+                    @foreach($stats['even_odd_stats'] as $combo => $count)
                         <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/50">
-                            <div class="text-sm font-bold text-slate-300">
-                                {{ $combo }}
-                            </div>
-                            <span class="font-bold text-slate-300 ml-2 text-xs">{{ $count }} times</span>
+                            <span class="text-sm font-bold text-slate-300">{{ $combo }}</span>
+                            <span class="font-bold text-slate-300">{{ $count }} times</span>
                         </div>
                     @endforeach
                 </div>
