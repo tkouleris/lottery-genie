@@ -11,6 +11,118 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class LottoService
 {
     /**
+     * @param string $folder
+     * @return array
+     * @throws FileNotFoundException
+     * @throws Exception
+     */
+    public function getStats(string $folder = 'stats/lotto'): array
+    {
+        $files = File::load_xlsx_files($folder);
+        $draws = [];
+
+        foreach ($files as $file) {
+            try {
+                $spreadsheet = IOFactory::load($file);
+                $worksheet = $spreadsheet->getActiveSheet();
+                $rows = $worksheet->toArray();
+
+                foreach ($rows as $index => $row) {
+                    // Παράλειψη επικεφαλίδας αν υπάρχει
+                    if ($index === 0 && isset($row[0]) && !is_numeric($row[0])) {
+                        continue;
+                    }
+
+                    // Φιλτράρισμα κενών κελιών
+                    $data = array_values(array_filter($row, fn($cell) => $cell !== null && $cell !== ''));
+
+                    if (count($data) >= 6) {
+                        $numbers = array_map('intval', array_slice($data, 0, 6));
+                        sort($numbers);
+                        $draws[] = [
+                            'numbers' => $numbers
+                        ];
+                    }
+                }
+            } catch (Exception $e) {
+                Log::error("Error reading file {$file}: " . $e->getMessage());
+            }
+        }
+
+        if (empty($draws)) {
+            throw new Exception("No data found in " . storage_path($folder));
+        }
+
+        return $this->calculateStatistics($draws);
+    }
+
+    private function calculateStatistics(array $draws): array
+    {
+        $numbers_freq = [];
+        $differences_freq = [];
+        $triples_freq = [];
+        $totalDraws = count($draws);
+
+        foreach ($draws as $draw) {
+            $numbers = $draw['numbers']; // Ήδη ταξινομημένα
+
+            // 1. Συχνότητα εμφάνισης αριθμών
+            foreach ($numbers as $num) {
+                $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
+            }
+
+            // 2. Διαφορά (max - min)
+            $diff = max($numbers) - min($numbers);
+            $differences_freq[$diff] = ($differences_freq[$diff] ?? 0) + 1;
+
+            // 3. Πιο συχνές 3άδες
+            $triples = $this->getCombinations($numbers, 3);
+            foreach ($triples as $triple) {
+                $key = implode(',', $triple);
+                $triples_freq[$key] = ($triples_freq[$key] ?? 0) + 1;
+            }
+        }
+
+        arsort($numbers_freq);
+        arsort($differences_freq);
+        arsort($triples_freq);
+
+        return [
+            'top_numbers' => array_slice($numbers_freq, 0, 10, true),
+            'top_differences' => array_slice($differences_freq, 0, 10, true),
+            'top_triples' => array_slice($triples_freq, 0, 10, true),
+            'total_draws_analyzed' => $totalDraws,
+        ];
+    }
+
+    /**
+     * Helper to get combinations
+     */
+    private function getCombinations(array $base, int $n): array
+    {
+        $results = [];
+        $count = count($base);
+
+        if ($n === 1) {
+            foreach ($base as $b) {
+                $results[] = [$b];
+            }
+            return $results;
+        }
+
+        for ($i = 0; $i <= $count - $n; $i++) {
+            $first = $base[$i];
+            $remaining = array_slice($base, $i + 1);
+            foreach ($this->getCombinations($remaining, $n - 1) as $combo) {
+                array_unshift($combo, $first);
+                $results[] = $combo;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * @return array[]
      * @throws FileNotFoundException
      */
