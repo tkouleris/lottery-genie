@@ -61,6 +61,7 @@ class LottoService
         $numbers_freq = [];
         $differences_freq = [];
         $triples_freq = [];
+        $even_odd_freq = [];
         $totalDraws = count($draws);
 
         foreach ($draws as $draw) {
@@ -71,9 +72,15 @@ class LottoService
                 $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
             }
 
-            // 2. Διαφορά (max - min)
+            // 2. Διαφορά (max - min) με ομαδοποίηση σε κλάσεις
             $diff = max($numbers) - min($numbers);
-            $differences_freq[$diff] = ($differences_freq[$diff] ?? 0) + 1;
+            if ($diff < 10) {
+                $class = '<10';
+            } else {
+                $base = floor($diff / 10) * 10;
+                $class = '>=' . $base;
+            }
+            $differences_freq[$class] = ($differences_freq[$class] ?? 0) + 1;
 
             // 3. Πιο συχνές 3άδες
             $triples = $this->getCombinations($numbers, 3);
@@ -81,16 +88,31 @@ class LottoService
                 $key = implode(',', $triple);
                 $triples_freq[$key] = ($triples_freq[$key] ?? 0) + 1;
             }
+
+            // 4. Συχνότητα Even / Odd
+            $evenCount = 0;
+            $oddCount = 0;
+            foreach ($numbers as $num) {
+                if ($num % 2 === 0) {
+                    $evenCount++;
+                } else {
+                    $oddCount++;
+                }
+            }
+            $evenOddKey = "{$evenCount} even / {$oddCount} odd";
+            $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
         }
 
         arsort($numbers_freq);
         arsort($differences_freq);
         arsort($triples_freq);
+        arsort($even_odd_freq);
 
         return [
             'top_numbers' => array_slice($numbers_freq, 0, 10, true),
             'top_differences' => array_slice($differences_freq, 0, 10, true),
             'top_triples' => array_slice($triples_freq, 0, 10, true),
+            'even_odd_stats' => $even_odd_freq,
             'total_draws_analyzed' => $totalDraws,
         ];
     }

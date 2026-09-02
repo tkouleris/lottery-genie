@@ -39,12 +39,16 @@ class LottoStatsCalculator extends Command
             $this->table(['Νούμερο', 'Συχνότητα'], $this->formatForTable($stats['top_numbers']));
 
             $this->newline();
-            $this->info('10 Πιο Συχνές Διαφορές (Max - Min)');
-            $this->table(['Διαφορά', 'Συχνότητα'], $this->formatForTable($stats['top_differences']));
+            $this->info('10 Πιο Συχνές Διαφορές (Max - Min) - Ομαδοποιημένες σε Κλάσεις');
+            $this->table(['Κλάση Διαφοράς', 'Συχνότητα'], $this->formatForTable($stats['top_differences']));
 
             $this->newline();
             $this->info('10 Πιο Συχνές 3άδες');
             $this->table(['3άδα', 'Συχνότητα'], $this->formatForTable($stats['top_triples']));
+
+            $this->newline();
+            $this->info('Συχνότητα Συνδυασμών Even / Odd');
+            $this->table(['Συνδυασμός', 'Συχνότητα'], $this->formatForTable($stats['even_odd_stats']));
 
         } catch (Exception $e) {
             $this->error($e->getMessage());
