@@ -4,7 +4,7 @@
 
 @section('content')
     <header class="text-center mb-12">
-        <img src="{{ asset('img/lotto.jpg') }}" alt="Lotto Logo" class="mx-auto">
+        <img src="{{ asset('img/lotto.jpg') }}" alt="Lotto Logo" class="mx-auto" style="max-height: 150px;">
         <p class="text-slate-400 text-lg">Your lucky predictions for the next draw</p>
     </header>
 

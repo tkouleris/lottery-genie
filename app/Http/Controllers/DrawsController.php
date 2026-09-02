@@ -56,4 +56,10 @@ class DrawsController extends Controller
 
         return view('lotto', compact('draws'));
     }
+
+    public function lotto_stats(LottoService $lottoService)
+    {
+        $stats = $lottoService->getStats();
+        return view('lotto-stats', compact('stats'));
+    }
 }
