@@ -25,17 +25,30 @@
             </div>
         </section>
 
-        <div class="grid md:grid-cols-2 gap-8">
+        <div class="grid md:grid-cols-3 gap-8">
             <!-- Joker Frequency -->
             <section class="card-glass rounded-3xl p-8">
                 <h2 class="text-2xl font-bold mb-6 text-yellow-400">Joker Frequency (1-12)</h2>
-                <div class="grid grid-cols-4 md:grid-cols-6 gap-4">
+                <div class="grid grid-cols-4 gap-4">
                     @foreach($stats['joker_frequency'] as $num => $count)
                         <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
                             <div class="ball joker-ball w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold mb-1">
                                 {{ $num }}
                             </div>
                             <span class="text-xs text-slate-400">{{ $count }} times</span>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+
+            <!-- Even / Odd Frequency -->
+            <section class="card-glass rounded-3xl p-8">
+                <h2 class="text-2xl font-bold mb-6 text-green-400">Even / Odd Combinations</h2>
+                <div class="space-y-4">
+                    @foreach($stats['even_odd_stats'] as $combo => $count)
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/50">
+                            <span class="text-sm font-bold text-slate-300">{{ $combo }}</span>
+                            <span class="font-bold text-slate-300">{{ $count }} times</span>
                         </div>
                     @endforeach
                 </div>

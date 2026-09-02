@@ -203,13 +203,23 @@ class EurojackpotService
         $numberFrequency = array_fill(1, 50, 0);
         $jokerFrequency = array_fill(1, 12, 0);
         $jokerPairsFrequency = [];
+        $even_odd_freq = [];
 
         foreach ($allDraws as $draw) {
+            $evenCount = 0;
+            $oddCount = 0;
             for ($i = 0; $i < 5; $i++) {
                 if (isset($draw[$i]) && $draw[$i] >= 1 && $draw[$i] <= 50) {
                     $numberFrequency[$draw[$i]]++;
+                    if ($draw[$i] % 2 === 0) {
+                        $evenCount++;
+                    } else {
+                        $oddCount++;
+                    }
                 }
             }
+            $evenOddKey = "{$evenCount} even / {$oddCount} odd";
+            $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
 
             $jokers = [];
             for ($i = 5; $i <= 6; $i++) {
@@ -232,11 +242,13 @@ class EurojackpotService
         arsort($numberFrequency);
         arsort($jokerFrequency);
         arsort($jokerPairsFrequency);
+        arsort($even_odd_freq);
 
         return [
             'number_frequency' => $numberFrequency,
             'joker_frequency' => $jokerFrequency,
             'common_joker_combinations' => array_slice($jokerPairsFrequency, 0, 10, true),
+            'even_odd_stats' => $even_odd_freq,
             'total_draws_analyzed' => count($allDraws)
         ];
     }
