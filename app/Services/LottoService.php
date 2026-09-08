@@ -53,10 +53,10 @@ class LottoService
             throw new Exception("No data found in " . storage_path($folder));
         }
 
-        return $this->calculateStatistics($draws);
+        return $this->calculateStatistics($draws, $folder);
     }
 
-    private function calculateStatistics(array $draws): array
+    private function calculateStatistics(array $draws, string $folder): array
     {
         $numbers_freq = [];
         $differences_freq = [];
@@ -114,6 +114,7 @@ class LottoService
             'top_triples' => array_slice($triples_freq, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
             'total_draws_analyzed' => $totalDraws,
+            'latest_draw_date' => File::get_latest_file_date($folder),
         ];
     }
 

@@ -249,7 +249,8 @@ class EurojackpotService
             'joker_frequency' => $jokerFrequency,
             'common_joker_combinations' => array_slice($jokerPairsFrequency, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
-            'total_draws_analyzed' => count($allDraws)
+            'total_draws_analyzed' => count($allDraws),
+            'latest_draw_date' => File::get_latest_file_date($folder),
         ];
     }
 

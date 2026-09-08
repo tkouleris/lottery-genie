@@ -7,6 +7,9 @@
         <img src="{{ asset('img/tzoker.jpg') }}" alt="Joker Logo" class="mx-auto" style="max-height: 150px;">
         <h1 class="text-3xl font-bold mt-4">Joker Statistics</h1>
         <p class="text-slate-400 text-lg">Historical data analysis ({{ $stats['total_draws_analyzed'] }} draws)</p>
+        @if(isset($stats['latest_draw_date']))
+            <p class="text-slate-500 text-sm mt-2">Latest update: {{ $stats['latest_draw_date'] }}</p>
+        @endif
     </header>
 
     <div class="space-y-8">

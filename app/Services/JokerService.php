@@ -55,10 +55,10 @@ class JokerService
             throw new Exception("No data found in " . storage_path($folder));
         }
 
-        return $this->calculateStatistics($draws);
+        return $this->calculateStatistics($draws, $folder);
     }
 
-    private function calculateStatistics(array $draws): array
+    private function calculateStatistics(array $draws, string $folder): array
     {
         $medians = [];
         $jokers = [];
@@ -107,6 +107,7 @@ class JokerService
             'top_numbers' => array_slice($numbers_freq, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
             'total_draws_analyzed' => $totalDraws,
+            'latest_draw_date' => File::get_latest_file_date($folder),
         ];
     }
 
