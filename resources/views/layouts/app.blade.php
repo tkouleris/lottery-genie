@@ -104,7 +104,7 @@
 
         <footer class="mt-16 text-center text-slate-500 text-sm">
             <p>Calculated based on historical data. Good luck!</p>
-            <p class="mt-2">&copy; {{ date('Y') }} Lottery Genie</p>
+            <p class="mt-2">&copy; {{ date('Y') }} Lottery Genie - <a href="https://tkouleris.eu/">Thodoris Kouleris</a></p>
         </footer>
     </div>
     <script>
