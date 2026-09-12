@@ -27,7 +27,7 @@ class EurojackpotService
 
                 foreach ($rows as $index => $row) {
                     // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3 || !isset($row[0]) || !is_numeric($row[0])) {
+                    if ($index < 3 ) {
                         continue;
                     }
 
@@ -187,7 +187,7 @@ class EurojackpotService
 
                 foreach ($rows as $index => $row) {
                     // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3 || !isset($row[0]) || !is_numeric($row[0])) {
+                    if ($index < 3) {
                         continue;
                     }
 
