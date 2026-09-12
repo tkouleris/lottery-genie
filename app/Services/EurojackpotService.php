@@ -26,15 +26,23 @@ class EurojackpotService
                 $rows = $worksheet->toArray();
 
                 foreach ($rows as $index => $row) {
-                    // Skip header if it looks like one (e.g., contains non-numeric data in first column)
-                    if ($index === 0 && !is_numeric($row[0])) {
+                    // Skip header rows (first 3 rows) and non-numeric rows
+                    if ($index < 3 || !isset($row[0]) || !is_numeric($row[0])) {
                         continue;
                     }
 
-                    // Filter out empty rows and ensure we have enough columns
-                    $data = array_filter($row, fn($cell) => $cell !== null);
-                    if (count($data) >= 7) {
-                        $finalStatistics[] = array_map('intval', array_values($data));
+                    // The numbers start 2 columns after the date (which is at index 1)
+                    // So numbers are at indices 2, 3, 4, 5, 6
+                    // Jokers are at indices 7, 8
+                    $drawData = [];
+                    for ($i = 2; $i <= 8; $i++) {
+                        if (isset($row[$i]) && is_numeric($row[$i])) {
+                            $drawData[] = (int)$row[$i];
+                        }
+                    }
+
+                    if (count($drawData) === 7) {
+                        $finalStatistics[] = $drawData;
                     }
                 }
             } catch (Exception $e) {
@@ -47,12 +55,8 @@ class EurojackpotService
             throw new Exception("No data found in {$folderPath}. Using empty dataset.");
         }
 
-        $jokerIndex1 = 5;
-        $jokerIndex2 = 6;
-
         $joker = array_fill(1, 12, 0);
         $number = array_fill(1, 50, 0);
-        $totalEven = array_fill(0, 6, 0);
         $jokerEven = array_fill(0, 3, 0);
         $jokerSums = [];
 
@@ -64,11 +68,11 @@ class EurojackpotService
                 }
             }
 
-            if (isset($draw[$jokerIndex1])) {
-                $joker[$draw[$jokerIndex1]]++;
+            if (isset($draw[5])) {
+                $joker[$draw[5]]++;
             }
-            if (isset($draw[$jokerIndex2])) {
-                $joker[$draw[$jokerIndex2]]++;
+            if (isset($draw[6])) {
+                $joker[$draw[6]]++;
             }
 
             $tmpJokerDraw = array_slice($draw, 5, 2);
@@ -182,13 +186,21 @@ class EurojackpotService
                 $rows = $worksheet->toArray();
 
                 foreach ($rows as $index => $row) {
-                    if ($index === 0 && !is_numeric($row[0])) {
+                    // Skip header rows (first 3 rows) and non-numeric rows
+                    if ($index < 3 || !isset($row[0]) || !is_numeric($row[0])) {
                         continue;
                     }
 
-                    $data = array_filter($row, fn($cell) => $cell !== null);
-                    if (count($data) >= 7) {
-                        $allDraws[] = array_map('intval', array_values($data));
+                    // Numbers at indices 2-6, Jokers at indices 7-8
+                    $drawData = [];
+                    for ($i = 2; $i <= 8; $i++) {
+                        if (isset($row[$i]) && is_numeric($row[$i])) {
+                            $drawData[] = (int)$row[$i];
+                        }
+                    }
+
+                    if (count($drawData) === 7) {
+                        $allDraws[] = $drawData;
                     }
                 }
             } catch (Exception $e) {
