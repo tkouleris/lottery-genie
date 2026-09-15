@@ -28,17 +28,24 @@ class JokerService
                 $rows = $worksheet->toArray();
 
                 foreach ($rows as $index => $row) {
-                    // Παράλειψη επικεφαλίδας αν υπάρχει
-                    if ($index === 0 && isset($row[0]) && !is_numeric($row[0])) {
+                    // Skip header rows (first 3 rows) and non-numeric rows
+                    if ($index < 3 ) {
                         continue;
                     }
 
-                    // Φιλτράρισμα κενών κελιών
-                    $data = array_values(array_filter($row, fn($cell) => $cell !== null && $cell !== ''));
+                    // The numbers start 2 columns after the date (which is at index 1)
+                    // So numbers are at indices 2, 3, 4, 5, 6
+                    // Jokers are at indices 7
+                    $drawData = [];
+                    for ($i = 2; $i <= 7; $i++) {
+                        if (isset($row[$i]) && is_numeric($row[$i])) {
+                            $drawData[] = (int)$row[$i];
+                        }
+                    }
 
-                    if (count($data) >= 6) {
-                        $numbers = array_map('intval', array_slice($data, 0, 5));
-                        $joker = intval($data[5]);
+                    if (count($drawData) >= 6) {
+                        $numbers = array_map('intval', array_slice($drawData, 0, 5));
+                        $joker = intval($drawData[5]);
                         sort($numbers);
                         $draws[] = [
                             'numbers' => $numbers,
@@ -155,15 +162,23 @@ class JokerService
                 $rows = $worksheet->toArray();
 
                 foreach ($rows as $index => $row) {
-                    // Skip header if it looks like one (e.g., contains non-numeric data in first column)
-                    if ($index === 0 && !is_numeric($row[0])) {
+                    // Skip header rows (first 3 rows) and non-numeric rows
+                    if ($index < 3 ) {
                         continue;
                     }
 
-                    // Filter out empty rows and ensure we have enough columns
-                    $data = array_filter($row, fn($cell) => $cell !== null);
-                    if (count($data) >= 6) {
-                        $finalStatistics[] = array_map('intval', array_values($data));
+                    // The numbers start 2 columns after the date (which is at index 1)
+                    // So numbers are at indices 2, 3, 4, 5, 6
+                    // Jokers are at indices 7
+                    $drawData = [];
+                    for ($i = 2; $i <= 7; $i++) {
+                        if (isset($row[$i]) && is_numeric($row[$i])) {
+                            $drawData[] = (int)$row[$i];
+                        }
+                    }
+
+                    if (count($drawData) >= 6) {
+                        $finalStatistics[] = $drawData;
                     }
                 }
             } catch (Exception $e) {
