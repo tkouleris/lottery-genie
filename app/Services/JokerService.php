@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\File;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Log;
@@ -298,6 +299,48 @@ class JokerService
         return [
             'numbers' => $finalNumbers,
             'jokers' => $finalJokers,
+        ];
+    }
+
+    public function getLatestDrawDate(string $folder = 'stats/joker'): array
+    {
+        $files = File::load_xlsx_files($folder);
+        $lastDraw = [];
+
+        foreach ($files as $file) {
+            try {
+                $spreadsheet = IOFactory::load($file);
+                $worksheet = $spreadsheet->getActiveSheet();
+                $rows = $worksheet->toArray();
+
+                foreach ($rows as $index => $row) {
+                    // Skip header rows (first 3 rows) and non-numeric rows
+                    if ($index < 3 ) {
+                        continue;
+                    }
+
+                    if(count($lastDraw) ==0) {
+                        $lastDraw = $row;
+                    }
+                    $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
+                    $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
+                    if($previous_date->lt($current_date)) {
+                        $lastDraw = $row;
+                    }
+                }
+            } catch (Exception $e) {
+                Log::error("Error reading file {$file}: " . $e->getMessage());
+            }
+        }
+        if(count($lastDraw) ==0) {
+            return [];
+        }
+
+        return [
+            'id' => $lastDraw[0],
+            'date' => $lastDraw[1],
+            'numbers' => [$lastDraw[2], $lastDraw[3], $lastDraw[4], $lastDraw[5], $lastDraw[6]],
+            'joker' => [$lastDraw[7]],
         ];
     }
 }
