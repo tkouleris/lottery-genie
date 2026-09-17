@@ -281,7 +281,7 @@ class LottoService
                     if(count($lastDraw) == 0) {
                         $lastDraw = $row;
                     }
-                    dd($lastDraw);
+
                     $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
                     $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
                     if($previous_date->lt($current_date)) {

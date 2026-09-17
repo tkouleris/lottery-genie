@@ -11,14 +11,10 @@ class MainController extends Controller
 {
     public function index(EurojackpotService $eurojackpotService, JokerService $jokerService, LottoService $lottoService)
     {
-        $euro = [];
-        $euro[] = $eurojackpotService->run();
 
-        $joker = [];
-        $joker[] = $jokerService->run();
-
-        $lotto = [];
-        $lotto[] = $lottoService->run();
+        $euro = $eurojackpotService->getLatestDrawDate();
+        $joker = $jokerService->getLatestDrawDate();
+        $lotto = $lottoService->getLatestDrawDate();
         return view('main', compact('euro', 'joker', 'lotto'));
     }
 }

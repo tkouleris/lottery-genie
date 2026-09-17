@@ -15,8 +15,8 @@ class ExampleTest extends TestCase
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        $response->assertSee('Eurojackpot Numbers');
-        $response->assertSee('Prediction #1');
-        $response->assertSee('Prediction #2');
+        $response->assertSee('Eurojackpot');
+        $response->assertSee('Joker');
+        $response->assertSee('Lotto');
     }
 }
