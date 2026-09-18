@@ -6,6 +6,7 @@ use App\Helpers\File;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -269,6 +270,10 @@ class EurojackpotService
 
     public function getLatestDrawDate(string $folder = 'stats/euro'): array
     {
+        $out = Cache::get('eurojackpot_latest_draw_date');
+        if($out) {
+            return $out;
+        }
         $files = File::load_xlsx_files($folder);
         $lastDraw = [];
 
