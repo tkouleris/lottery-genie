@@ -28,7 +28,8 @@ class JokerStatsCalculator extends Command
     public function handle(JokerService $service): int
     {
         $this->info('Calculating Joker statistics...');
-
+        $service->run();
+        dd('done');
         try {
             $stats = $service->getStats();
 

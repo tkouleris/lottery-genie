@@ -6,6 +6,7 @@ use App\Helpers\File;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -153,39 +154,45 @@ class JokerService
      */
     public function run($folder = 'stats/joker'): array
     {
-        $files = File::load_xlsx_files($folder);
-        $finalStatistics = [];
+        $out = Cache::get('joker_draws');
+        if(is_null($out)) {
+            $files = File::load_xlsx_files($folder);
+            $finalStatistics = [];
 
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
+            foreach ($files as $file) {
+                try {
+                    $spreadsheet = IOFactory::load($file);
+                    $worksheet = $spreadsheet->getActiveSheet();
+                    $rows = $worksheet->toArray();
 
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3 ) {
-                        continue;
-                    }
+                    foreach ($rows as $index => $row) {
+                        // Skip header rows (first 3 rows) and non-numeric rows
+                        if ($index < 3 ) {
+                            continue;
+                        }
 
-                    // The numbers start 2 columns after the date (which is at index 1)
-                    // So numbers are at indices 2, 3, 4, 5, 6
-                    // Jokers are at indices 7
-                    $drawData = [];
-                    for ($i = 2; $i <= 7; $i++) {
-                        if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                        // The numbers start 2 columns after the date (which is at index 1)
+                        // So numbers are at indices 2, 3, 4, 5, 6
+                        // Jokers are at indices 7
+                        $drawData = [];
+                        for ($i = 2; $i <= 7; $i++) {
+                            if (isset($row[$i]) && is_numeric($row[$i])) {
+                                $drawData[] = (int)$row[$i];
+                            }
+                        }
+
+                        if (count($drawData) >= 6) {
+                            $finalStatistics[] = $drawData;
                         }
                     }
-
-                    if (count($drawData) >= 6) {
-                        $finalStatistics[] = $drawData;
-                    }
+                } catch (Exception $e) {
+                    Log::error("Error reading file {$file}: " . $e->getMessage());
                 }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
             }
+        }else{
+            $finalStatistics = $out;
         }
+
 
         if (empty($finalStatistics)) {
             $folderPath = storage_path($folder);
