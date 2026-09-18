@@ -6,6 +6,7 @@ use App\Helpers\File;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -262,6 +263,11 @@ class LottoService
 
     public function getLatestDrawDate(string $folder = 'stats/lotto'): array
     {
+        $out = Cache::get('lotto_latest_draw_date');
+        if($out) {
+            return $out;
+        }
+
         $files = File::load_xlsx_files($folder);
         $lastDraw = [];
 
