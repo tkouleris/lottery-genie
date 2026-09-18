@@ -31,6 +31,7 @@ class CacheJoker extends Command
     public function handle()
     {
         Cache::forget('joker_draws');
+        Cache::forget('joker_stats');
 
         $folder = 'stats/joker';
         $files = File::load_xlsx_files($folder);
@@ -41,7 +42,7 @@ class CacheJoker extends Command
                 $spreadsheet = IOFactory::load($file);
                 $worksheet = $spreadsheet->getActiveSheet();
                 $rows = $worksheet->toArray();
-
+                $draws = [];
                 foreach ($rows as $index => $row) {
                     // Skip header rows (first 3 rows) and non-numeric rows
                     if ($index < 3 ) {
@@ -60,6 +61,14 @@ class CacheJoker extends Command
 
                     if (count($drawData) >= 6) {
                         $finalStatistics[] = $drawData;
+
+                        $numbers = array_map('intval', array_slice($drawData, 0, 5));
+                        $joker = intval($drawData[5]);
+                        sort($numbers);
+                        $draws[] = [
+                            'numbers' => $numbers,
+                            'joker' => $joker
+                        ];
                     }
                 }
             } catch (Exception $e) {
@@ -68,5 +77,6 @@ class CacheJoker extends Command
         }
 
         Cache::put('joker_draws', $finalStatistics, now()->addDays(7));
+        Cache::put('joker_stats', $draws, now()->addDays(7));
     }
 }

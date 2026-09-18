@@ -20,45 +20,52 @@ class JokerService
      */
     public function getStats(string $folder = 'stats/joker'): array
     {
-        $files = File::load_xlsx_files($folder);
+        $out = Cache::get('joker_stats');
+
         $draws = [];
+        if(is_null($out)) {
+            $files = File::load_xlsx_files($folder);
 
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
+            foreach ($files as $file) {
+                try {
+                    $spreadsheet = IOFactory::load($file);
+                    $worksheet = $spreadsheet->getActiveSheet();
+                    $rows = $worksheet->toArray();
 
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3 ) {
-                        continue;
-                    }
+                    foreach ($rows as $index => $row) {
+                        // Skip header rows (first 3 rows) and non-numeric rows
+                        if ($index < 3 ) {
+                            continue;
+                        }
 
-                    // The numbers start 2 columns after the date (which is at index 1)
-                    // So numbers are at indices 2, 3, 4, 5, 6
-                    // Jokers are at indices 7
-                    $drawData = [];
-                    for ($i = 2; $i <= 7; $i++) {
-                        if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                        // The numbers start 2 columns after the date (which is at index 1)
+                        // So numbers are at indices 2, 3, 4, 5, 6
+                        // Jokers are at indices 7
+                        $drawData = [];
+                        for ($i = 2; $i <= 7; $i++) {
+                            if (isset($row[$i]) && is_numeric($row[$i])) {
+                                $drawData[] = (int)$row[$i];
+                            }
+                        }
+
+                        if (count($drawData) >= 6) {
+                            $numbers = array_map('intval', array_slice($drawData, 0, 5));
+                            $joker = intval($drawData[5]);
+                            sort($numbers);
+                            $draws[] = [
+                                'numbers' => $numbers,
+                                'joker' => $joker
+                            ];
                         }
                     }
-
-                    if (count($drawData) >= 6) {
-                        $numbers = array_map('intval', array_slice($drawData, 0, 5));
-                        $joker = intval($drawData[5]);
-                        sort($numbers);
-                        $draws[] = [
-                            'numbers' => $numbers,
-                            'joker' => $joker
-                        ];
-                    }
+                } catch (Exception $e) {
+                    Log::error("Error reading file {$file}: " . $e->getMessage());
                 }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
             }
+        }else{
+            $draws = $out;
         }
+
 
         if (empty($draws)) {
             throw new Exception("No data found in " . storage_path($folder));
