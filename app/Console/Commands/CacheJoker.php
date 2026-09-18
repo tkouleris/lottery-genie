@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Helpers\File;
+use App\Services\JokerService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -110,5 +111,10 @@ class CacheJoker extends Command
             }
         }
         Cache::put('joker_stats', $draws, now()->addDays(7));
+
+        Cache::forget('joker_latest_draw_date');
+        $obj = resolve(JokerService::class);
+        $latest_draw = $obj->getLatestDrawDate();
+        Cache::put('joker_latest_draw_date', $latest_draw, now()->addDays(7));
     }
 }

@@ -318,6 +318,11 @@ class JokerService
 
     public function getLatestDrawDate(string $folder = 'stats/joker'): array
     {
+        $out = Cache::get('joker_latest_draw_date');
+        if($out) {
+            return $out;
+        }
+
         $files = File::load_xlsx_files($folder);
         $lastDraw = [];
 
