@@ -21,39 +21,42 @@ class LottoService
     public function getStats(string $folder = 'stats/lotto'): array
     {
         $files = File::load_xlsx_files($folder);
-        $draws = [];
+        $draws = Cache::get('lotto_stats');
 
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
+        if(is_null($draws)) {
+            $draws = [];
+            foreach ($files as $file) {
+                try {
+                    $spreadsheet = IOFactory::load($file);
+                    $worksheet = $spreadsheet->getActiveSheet();
+                    $rows = $worksheet->toArray();
 
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 4 ) {
-                        continue;
-                    }
+                    foreach ($rows as $index => $row) {
+                        // Skip header rows (first 3 rows) and non-numeric rows
+                        if ($index < 4 ) {
+                            continue;
+                        }
 
 
-                    // Φιλτράρισμα κενών κελιών
-                    $drawData = [];
-                    for ($i = 2; $i <= 7; $i++) {
-                        if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                        // Φιλτράρισμα κενών κελιών
+                        $drawData = [];
+                        for ($i = 2; $i <= 7; $i++) {
+                            if (isset($row[$i]) && is_numeric($row[$i])) {
+                                $drawData[] = (int)$row[$i];
+                            }
+                        }
+
+                        if (count($drawData) >= 6) {
+                            $numbers = array_map('intval', array_slice($drawData, 0, 6));
+                            sort($numbers);
+                            $draws[] = [
+                                'numbers' => $numbers
+                            ];
                         }
                     }
-
-                    if (count($drawData) >= 6) {
-                        $numbers = array_map('intval', array_slice($drawData, 0, 6));
-                        sort($numbers);
-                        $draws[] = [
-                            'numbers' => $numbers
-                        ];
-                    }
+                } catch (Exception $e) {
+                    Log::error("Error reading file {$file}: " . $e->getMessage());
                 }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
 
@@ -160,33 +163,36 @@ class LottoService
     public function run($folder = 'stats/lotto'): array
     {
         $files = File::load_xlsx_files($folder);
-        $finalStatistics = [];
+        $finalStatistics = Cache::get('lotto_draws');
 
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
+        if(is_null($finalStatistics)) {
+            $finalStatistics = [];
+            foreach ($files as $file) {
+                try {
+                    $spreadsheet = IOFactory::load($file);
+                    $worksheet = $spreadsheet->getActiveSheet();
+                    $rows = $worksheet->toArray();
 
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 4 ) {
-                        continue;
-                    }
+                    foreach ($rows as $index => $row) {
+                        // Skip header rows (first 3 rows) and non-numeric rows
+                        if ($index < 4 ) {
+                            continue;
+                        }
 
-                    // Φιλτράρισμα κενών κελιών
-                    $drawData = [];
-                    for ($i = 2; $i <= 7; $i++) {
-                        if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                        // Φιλτράρισμα κενών κελιών
+                        $drawData = [];
+                        for ($i = 2; $i <= 7; $i++) {
+                            if (isset($row[$i]) && is_numeric($row[$i])) {
+                                $drawData[] = (int)$row[$i];
+                            }
+                        }
+                        if (count($drawData) >= 6) {
+                            $finalStatistics[] = array_map('intval', array_values($drawData));
                         }
                     }
-                    if (count($drawData) >= 6) {
-                        $finalStatistics[] = array_map('intval', array_values($drawData));
-                    }
+                } catch (Exception $e) {
+                    Log::error("Error reading file {$file}: " . $e->getMessage());
                 }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
 
