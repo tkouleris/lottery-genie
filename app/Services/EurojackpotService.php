@@ -19,38 +19,44 @@ class EurojackpotService
     public function run($folder = 'stats/euro'): array
     {
         $files = File::load_xlsx_files($folder);
-        $finalStatistics = [];
+        $finalStatistics = Cache::get('eurojackpot_draws');
 
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
+        if(is_null($finalStatistics)){
+            $finalStatistics = [];
+            foreach ($files as $file) {
+                try {
+                    $spreadsheet = IOFactory::load($file);
+                    $worksheet = $spreadsheet->getActiveSheet();
+                    $rows = $worksheet->toArray();
 
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3 ) {
-                        continue;
-                    }
+                    foreach ($rows as $index => $row) {
+                        // Skip header rows (first 3 rows) and non-numeric rows
+                        if ($index < 3 ) {
+                            continue;
+                        }
 
-                    // The numbers start 2 columns after the date (which is at index 1)
-                    // So numbers are at indices 2, 3, 4, 5, 6
-                    // Jokers are at indices 7, 8
-                    $drawData = [];
-                    for ($i = 2; $i <= 8; $i++) {
-                        if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                        // The numbers start 2 columns after the date (which is at index 1)
+                        // So numbers are at indices 2, 3, 4, 5, 6
+                        // Jokers are at indices 7, 8
+                        $drawData = [];
+                        for ($i = 2; $i <= 8; $i++) {
+                            if (isset($row[$i]) && is_numeric($row[$i])) {
+                                $drawData[] = (int)$row[$i];
+                            }
+                        }
+
+                        if (count($drawData) === 7) {
+                            $finalStatistics[] = $drawData;
                         }
                     }
-
-                    if (count($drawData) === 7) {
-                        $finalStatistics[] = $drawData;
-                    }
+                } catch (Exception $e) {
+                    Log::error("Error reading file {$file}: " . $e->getMessage());
                 }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
+
+
+
 
         if (empty($finalStatistics)) {
             $folderPath = storage_path($folder);
@@ -179,34 +185,37 @@ class EurojackpotService
     public function get_stats(string $folder = 'stats/euro'): array
     {
         $files = File::load_xlsx_files($folder);
-        $allDraws = [];
+        $allDraws = Cache::get('eurojackpot_stats');
 
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
+        if(is_null($allDraws)) {
+            $allDraws = [];
+            foreach ($files as $file) {
+                try {
+                    $spreadsheet = IOFactory::load($file);
+                    $worksheet = $spreadsheet->getActiveSheet();
+                    $rows = $worksheet->toArray();
 
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3) {
-                        continue;
-                    }
+                    foreach ($rows as $index => $row) {
+                        // Skip header rows (first 3 rows) and non-numeric rows
+                        if ($index < 3) {
+                            continue;
+                        }
 
-                    // Numbers at indices 2-6, Jokers at indices 7-8
-                    $drawData = [];
-                    for ($i = 2; $i <= 8; $i++) {
-                        if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                        // Numbers at indices 2-6, Jokers at indices 7-8
+                        $drawData = [];
+                        for ($i = 2; $i <= 8; $i++) {
+                            if (isset($row[$i]) && is_numeric($row[$i])) {
+                                $drawData[] = (int)$row[$i];
+                            }
+                        }
+
+                        if (count($drawData) === 7) {
+                            $allDraws[] = $drawData;
                         }
                     }
-
-                    if (count($drawData) === 7) {
-                        $allDraws[] = $drawData;
-                    }
+                } catch (Exception $e) {
+                    Log::error("Error reading file {$file}: " . $e->getMessage());
                 }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
 
