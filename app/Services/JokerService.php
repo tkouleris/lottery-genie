@@ -360,6 +360,20 @@ class JokerService
             'date' => $lastDraw[1],
             'numbers' => [$lastDraw[2], $lastDraw[3], $lastDraw[4], $lastDraw[5], $lastDraw[6]],
             'joker' => [$lastDraw[7]],
+            'next_draw_date' => $this->getNextDrawDate(),
         ];
+    }
+
+    private function getNextDrawDate()
+    {
+        $now = Carbon::now();
+        return collect([
+            Carbon::SUNDAY,
+            Carbon::TUESDAY,
+            Carbon::THURSDAY,
+        ])->map(fn ($day) => $now->copy()->next($day))
+            ->sort()
+            ->first()
+            ->format('d/m/Y');
     }
 }

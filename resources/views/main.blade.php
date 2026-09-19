@@ -4,10 +4,11 @@
     <div class="grid gap-8 md:grid-cols-3 items-stretch">
         <!-- Eurojackpot Section -->
         <div class="flex flex-col mb-8 md:mb-0">
-            <header class="text-center mb-12">
+            <header class="text-center mb-3">
                 <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
-                    Draw #{{ $euro['id'] }} • {{ $euro['date'] }}
+                    <div>Draw #{{ $euro['id'] }} • {{ $euro['date'] }}</div>
+                    <div>Next Draw: {{ $euro['next_draw_date'] }}</div>
                 </div>
             </header>
 
@@ -33,10 +34,11 @@
 
         <!-- Joker Section -->
         <div class="flex flex-col mb-8 md:mb-0">
-            <header class="text-center mb-12">
+            <header class="text-center mb-3">
                 <img src="{{ asset('img/tzoker.jpg') }}" alt="Joker Logo" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
-                    Draw #{{ $joker['id'] }} • {{ $joker['date'] }}
+                    <div>Draw #{{ $joker['id'] }} • {{ $joker['date'] }}</div>
+                    <div>Next Draw: {{ $joker['next_draw_date'] }}</div>
                 </div>
             </header>
 
@@ -62,10 +64,11 @@
 
         <!-- Lotto Section -->
         <div class="flex flex-col mb-8 md:mb-0">
-            <header class="text-center mb-12">
+            <header class="text-center mb-3">
                 <img src="{{ asset('img/lotto.jpg') }}" alt="Lotto Logo" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
-                    Draw #{{ $lotto['id'] }} • {{ $lotto['date'] }}
+                    <div>Draw #{{ $lotto['id'] }} • {{ $lotto['date'] }}</div>
+                    <div>Next Draw: {{ $lotto['next_draw_date'] }}</div>
                 </div>
             </header>
 
