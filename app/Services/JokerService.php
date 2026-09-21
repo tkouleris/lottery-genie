@@ -26,7 +26,6 @@ class JokerService
             $draws = $output['stats'];
         }
 
-
         if (empty($draws)) {
             throw new Exception("No data found in " . storage_path($folder));
         }
@@ -87,32 +86,6 @@ class JokerService
         ];
     }
 
-    /**
-     * Helper to get combinations
-     */
-    private function getCombinations(array $base, int $n): array
-    {
-        $results = [];
-        $count = count($base);
-
-        if ($n === 1) {
-            foreach ($base as $b) {
-                $results[] = [$b];
-            }
-            return $results;
-        }
-
-        for ($i = 0; $i <= $count - $n; $i++) {
-            $first = $base[$i];
-            $remaining = array_slice($base, $i + 1);
-            foreach ($this->getCombinations($remaining, $n - 1) as $combo) {
-                array_unshift($combo, $first);
-                $results[] = $combo;
-            }
-        }
-
-        return $results;
-    }
 
     /**
      * @return array[]
@@ -137,9 +110,6 @@ class JokerService
 
         $joker = array_fill(1, 20, 0);
         $number = array_fill(1, 45, 0);
-//        $totalEven = array_fill(0, 6, 0);
-//        $jokerEven = array_fill(0, 3, 0);
-        $jokerSums = [];
 
         foreach ($finalStatistics as $draw) {
 
@@ -167,8 +137,6 @@ class JokerService
         }
         shuffle($stats);
 
-//        arsort($jokerSums);
-//        $allowedJokerSums = array_slice(array_keys($jokerSums), 0, (int)(count($jokerSums) / 2));
         $draws = [];
         for ($i = 0; $i < 100; $i++) {
             $draw = [
