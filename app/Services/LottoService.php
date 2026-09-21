@@ -20,44 +20,10 @@ class LottoService
      */
     public function getStats(string $folder = 'stats/lotto'): array
     {
-        $files = File::load_xlsx_files($folder);
         $draws = Cache::get('lotto_stats');
-
         if(is_null($draws)) {
-            $draws = [];
-            foreach ($files as $file) {
-                try {
-                    $spreadsheet = IOFactory::load($file);
-                    $worksheet = $spreadsheet->getActiveSheet();
-                    $rows = $worksheet->toArray();
-
-                    foreach ($rows as $index => $row) {
-                        // Skip header rows (first 3 rows) and non-numeric rows
-                        if ($index < 4 ) {
-                            continue;
-                        }
-
-
-                        // Φιλτράρισμα κενών κελιών
-                        $drawData = [];
-                        for ($i = 2; $i <= 7; $i++) {
-                            if (isset($row[$i]) && is_numeric($row[$i])) {
-                                $drawData[] = (int)$row[$i];
-                            }
-                        }
-
-                        if (count($drawData) >= 6) {
-                            $numbers = array_map('intval', array_slice($drawData, 0, 6));
-                            sort($numbers);
-                            $draws[] = [
-                                'numbers' => $numbers
-                            ];
-                        }
-                    }
-                } catch (Exception $e) {
-                    Log::error("Error reading file {$file}: " . $e->getMessage());
-                }
-            }
+            $output = $this->load_files($folder);
+            $draws = $output['stats'];
         }
 
         if (empty($draws)) {
@@ -158,42 +124,14 @@ class LottoService
 
     /**
      * @return array[]
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException|Exception
      */
     public function run($folder = 'stats/lotto'): array
     {
-        $files = File::load_xlsx_files($folder);
         $finalStatistics = Cache::get('lotto_draws');
-
         if(is_null($finalStatistics)) {
-            $finalStatistics = [];
-            foreach ($files as $file) {
-                try {
-                    $spreadsheet = IOFactory::load($file);
-                    $worksheet = $spreadsheet->getActiveSheet();
-                    $rows = $worksheet->toArray();
-
-                    foreach ($rows as $index => $row) {
-                        // Skip header rows (first 3 rows) and non-numeric rows
-                        if ($index < 4 ) {
-                            continue;
-                        }
-
-                        // Φιλτράρισμα κενών κελιών
-                        $drawData = [];
-                        for ($i = 2; $i <= 7; $i++) {
-                            if (isset($row[$i]) && is_numeric($row[$i])) {
-                                $drawData[] = (int)$row[$i];
-                            }
-                        }
-                        if (count($drawData) >= 6) {
-                            $finalStatistics[] = array_map('intval', array_values($drawData));
-                        }
-                    }
-                } catch (Exception $e) {
-                    Log::error("Error reading file {$file}: " . $e->getMessage());
-                }
-            }
+            $output = $this->load_files($folder);
+            $finalStatistics = $output['draws'];
         }
 
         if (empty($finalStatistics)) {
@@ -203,17 +141,12 @@ class LottoService
 
         $number = array_fill(1, 49, 0);
 
-        $jokerSums = [];
-
         foreach ($finalStatistics as $draw) {
-
             for ($i = 0; $i < 6; $i++) {
                 if (isset($draw[$i])) {
                     $number[$draw[$i]]++;
                 }
             }
-
-
         }
 
         $stats = [];
@@ -241,8 +174,6 @@ class LottoService
 
                 $draw['numbers'] = $currentNumbers;
             }
-
-
 
             $draws[] = $draw;
         }
@@ -315,6 +246,49 @@ class LottoService
             'joker' => [],
             'next_draw_date' => $this->getNextDrawDate(),
         ];
+    }
+
+    public function load_files($folder = 'stats/lotto')
+    {
+        $files = File::load_xlsx_files($folder);
+
+        $finalStatistics = [];
+        $stats = [];
+        foreach ($files as $file) {
+            try {
+                $spreadsheet = IOFactory::load($file);
+                $worksheet = $spreadsheet->getActiveSheet();
+                $rows = $worksheet->toArray();
+
+                foreach ($rows as $index => $row) {
+                    // Skip header rows (first 3 rows) and non-numeric rows
+                    if ($index < 4 ) {
+                        continue;
+                    }
+
+                    $drawData = [];
+                    for ($i = 2; $i <= 7; $i++) {
+                        if (isset($row[$i]) && is_numeric($row[$i])) {
+                            $drawData[] = (int)$row[$i];
+                        }
+                    }
+                    if (count($drawData) >= 6) {
+                        $finalStatistics[] = array_map('intval', array_values($drawData));
+                    }
+
+                    if (count($drawData) >= 6) {
+                        $numbers = array_map('intval', array_slice($drawData, 0, 6));
+                        sort($numbers);
+                        $stats[] = [
+                            'numbers' => $numbers
+                        ];
+                    }
+                }
+            } catch (Exception $e) {
+                Log::error("Error reading file {$file}: " . $e->getMessage());
+            }
+        }
+        return ['draws' => $finalStatistics, 'stats' => $stats];
     }
 
     private function getNextDrawDate()

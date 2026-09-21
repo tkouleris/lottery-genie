@@ -33,74 +33,15 @@ class CacheLotto extends Command
     public function handle()
     {
         $folder = 'stats/lotto';
-        $files = File::load_xlsx_files($folder);
+        $obj = resolve(LottoService::class);
+        $output = $obj->load_files($folder);
 
         Cache::forget('lotto_draws');
-        $finalStatistics = [];
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
-
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 4 ) {
-                        continue;
-                    }
-
-                    // Φιλτράρισμα κενών κελιών
-                    $drawData = [];
-                    for ($i = 2; $i <= 7; $i++) {
-                        if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
-                        }
-                    }
-                    if (count($drawData) >= 6) {
-                        $finalStatistics[] = array_map('intval', array_values($drawData));
-                    }
-                }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
-            }
-        }
+        $finalStatistics = $output['draws'];
         Cache::put('lotto_draws', $finalStatistics, now()->addDays(7));
 
         Cache::forget('lotto_stats');
-        $draws = [];
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
-
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 4 ) {
-                        continue;
-                    }
-
-
-                    // Φιλτράρισμα κενών κελιών
-                    $drawData = [];
-                    for ($i = 2; $i <= 7; $i++) {
-                        if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
-                        }
-                    }
-
-                    if (count($drawData) >= 6) {
-                        $numbers = array_map('intval', array_slice($drawData, 0, 6));
-                        sort($numbers);
-                        $draws[] = [
-                            'numbers' => $numbers
-                        ];
-                    }
-                }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
-            }
-        }
+        $draws = $output['stats'];
         Cache::put('lotto_stats', $draws, now()->addDays(7));
 
         Cache::forget('lotto_latest_draw_date');
