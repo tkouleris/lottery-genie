@@ -20,50 +20,10 @@ class JokerService
      */
     public function getStats(string $folder = 'stats/joker'): array
     {
-        $out = Cache::get('joker_stats');
-
-        $draws = [];
-        if(is_null($out)) {
-            $files = File::load_xlsx_files($folder);
-
-            foreach ($files as $file) {
-                try {
-                    $spreadsheet = IOFactory::load($file);
-                    $worksheet = $spreadsheet->getActiveSheet();
-                    $rows = $worksheet->toArray();
-
-                    foreach ($rows as $index => $row) {
-                        // Skip header rows (first 3 rows) and non-numeric rows
-                        if ($index < 3 ) {
-                            continue;
-                        }
-
-                        // The numbers start 2 columns after the date (which is at index 1)
-                        // So numbers are at indices 2, 3, 4, 5, 6
-                        // Jokers are at indices 7
-                        $drawData = [];
-                        for ($i = 2; $i <= 7; $i++) {
-                            if (isset($row[$i]) && is_numeric($row[$i])) {
-                                $drawData[] = (int)$row[$i];
-                            }
-                        }
-
-                        if (count($drawData) >= 6) {
-                            $numbers = array_map('intval', array_slice($drawData, 0, 5));
-                            $joker = intval($drawData[5]);
-                            sort($numbers);
-                            $draws[] = [
-                                'numbers' => $numbers,
-                                'joker' => $joker
-                            ];
-                        }
-                    }
-                } catch (Exception $e) {
-                    Log::error("Error reading file {$file}: " . $e->getMessage());
-                }
-            }
-        }else{
-            $draws = $out;
+        $draws = Cache::get('joker_stats');
+        if(is_null($draws)) {
+            $output = $this->load_files($folder);
+            $draws = $output['stats'];
         }
 
 
@@ -161,43 +121,10 @@ class JokerService
      */
     public function run($folder = 'stats/joker'): array
     {
-        $out = Cache::get('joker_draws');
-        if(is_null($out)) {
-            $files = File::load_xlsx_files($folder);
-            $finalStatistics = [];
-
-            foreach ($files as $file) {
-                try {
-                    $spreadsheet = IOFactory::load($file);
-                    $worksheet = $spreadsheet->getActiveSheet();
-                    $rows = $worksheet->toArray();
-
-                    foreach ($rows as $index => $row) {
-                        // Skip header rows (first 3 rows) and non-numeric rows
-                        if ($index < 3 ) {
-                            continue;
-                        }
-
-                        // The numbers start 2 columns after the date (which is at index 1)
-                        // So numbers are at indices 2, 3, 4, 5, 6
-                        // Jokers are at indices 7
-                        $drawData = [];
-                        for ($i = 2; $i <= 7; $i++) {
-                            if (isset($row[$i]) && is_numeric($row[$i])) {
-                                $drawData[] = (int)$row[$i];
-                            }
-                        }
-
-                        if (count($drawData) >= 6) {
-                            $finalStatistics[] = $drawData;
-                        }
-                    }
-                } catch (Exception $e) {
-                    Log::error("Error reading file {$file}: " . $e->getMessage());
-                }
-            }
-        }else{
-            $finalStatistics = $out;
+        $finalStatistics = Cache::get('joker_draws');
+        if(is_null($finalStatistics)) {
+            $output = $this->load_files($folder);
+            $finalStatistics = $output['draws'];
         }
 
 
@@ -225,15 +152,6 @@ class JokerService
             if (isset($draw[$jokerIndex])) {
                 $joker[$draw[$jokerIndex]]++;
             }
-
-//            $tmpJokerDraw = array_slice($draw, 5, 2);
-//            if (count($tmpJokerDraw) === 2) {
-//                $jokerEvens = count(array_filter($tmpJokerDraw, fn($n) => $n % 2 === 0));
-//                $jokerEven[$jokerEvens]++;
-//
-//                $drawJokerSum = array_sum($tmpJokerDraw);
-//                $jokerSums[$drawJokerSum] = ($jokerSums[$drawJokerSum] ?? 0) + 1;
-//            }
         }
 
 
@@ -362,6 +280,54 @@ class JokerService
             'joker' => [$lastDraw[7]],
             'next_draw_date' => $this->getNextDrawDate(),
         ];
+    }
+
+    public function load_files($folder = 'stats/joker')
+    {
+        $files = File::load_xlsx_files($folder);
+        $finalStatistics = [];
+        $stats = [];
+        foreach ($files as $file) {
+            try {
+                $spreadsheet = IOFactory::load($file);
+                $worksheet = $spreadsheet->getActiveSheet();
+                $rows = $worksheet->toArray();
+
+                foreach ($rows as $index => $row) {
+                    // Skip header rows (first 3 rows) and non-numeric rows
+                    if ($index < 3 ) {
+                        continue;
+                    }
+
+                    // The numbers start 2 columns after the date (which is at index 1)
+                    // So numbers are at indices 2, 3, 4, 5, 6
+                    // Jokers are at indices 7
+                    $drawData = [];
+                    for ($i = 2; $i <= 7; $i++) {
+                        if (isset($row[$i]) && is_numeric($row[$i])) {
+                            $drawData[] = (int)$row[$i];
+                        }
+                    }
+
+                    if (count($drawData) >= 6) {
+                        $finalStatistics[] = $drawData;
+                    }
+
+                    if (count($drawData) >= 6) {
+                        $numbers = array_map('intval', array_slice($drawData, 0, 5));
+                        $joker = intval($drawData[5]);
+                        sort($numbers);
+                        $stats[] = [
+                            'numbers' => $numbers,
+                            'joker' => $joker
+                        ];
+                    }
+                }
+            } catch (Exception $e) {
+                Log::error("Error reading file {$file}: " . $e->getMessage());
+            }
+        }
+        return ['draws' => $finalStatistics, 'stats' => $stats];
     }
 
     private function getNextDrawDate()
