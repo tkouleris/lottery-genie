@@ -223,7 +223,13 @@ class JokerService
         ];
     }
 
-    public function load_files($folder = 'stats/joker')
+    /**
+     * loading joker draws data from xlsx files
+     * @param string $folder
+     * @return array
+     * @throws FileNotFoundException
+     */
+    public function load_files(string $folder = 'stats/joker'): array
     {
         $files = File::load_xlsx_files($folder);
         $finalStatistics = [];

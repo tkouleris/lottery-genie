@@ -241,12 +241,12 @@ class EurojackpotService
     }
 
     /**
-     * laoding eurojackpot draws data from xlsx files
-     * @param $folder
+     * loading eurojackpot draws data from xlsx files
+     * @param string $folder
      * @return array
      * @throws FileNotFoundException
      */
-    public function load_files($folder = 'stats/euro'): array
+    public function load_files(string $folder = 'stats/euro'): array
     {
         $files = File::load_xlsx_files($folder);
         $finalStatistics = [];

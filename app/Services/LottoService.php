@@ -220,6 +220,7 @@ class LottoService
     }
 
     /**
+     * loading lotto draws data from xlsx files
      * @param string $folder
      * @return array
      * @throws FileNotFoundException
