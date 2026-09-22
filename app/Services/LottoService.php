@@ -219,7 +219,12 @@ class LottoService
         ];
     }
 
-    public function load_files($folder = 'stats/lotto')
+    /**
+     * @param string $folder
+     * @return array
+     * @throws FileNotFoundException
+     */
+    public function load_files(string $folder = 'stats/lotto'): array
     {
         $files = File::load_xlsx_files($folder);
 
