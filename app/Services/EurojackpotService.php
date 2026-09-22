@@ -20,7 +20,8 @@ class EurojackpotService
     {
         $finalStatistics = Cache::get('eurojackpot_draws');
         if(is_null($finalStatistics)){
-            $finalStatistics = $this->load_files();
+            $output = $this->load_files();
+            $finalStatistics = $output['stats'];
         }
 
         if (empty($finalStatistics)) {
@@ -151,7 +152,8 @@ class EurojackpotService
     {
         $allDraws = Cache::get('eurojackpot_stats');
         if(is_null($allDraws)) {
-            $allDraws =$this->load_files();
+            $output = $this->load_files();
+            $allDraws = $output['stats'];
         }
 
         if (empty($allDraws)) {
@@ -269,6 +271,7 @@ class EurojackpotService
     {
         $files = File::load_xlsx_files($folder);
         $finalStatistics = [];
+        $lastDraw = [];
         foreach ($files as $file) {
             try {
                 $spreadsheet = IOFactory::load($file);
@@ -294,12 +297,21 @@ class EurojackpotService
                     if (count($drawData) === 7) {
                         $finalStatistics[] = $drawData;
                     }
+
+                    if(count($lastDraw) ==0) {
+                        $lastDraw = $row;
+                    }
+                    $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
+                    $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
+                    if($previous_date->lt($current_date)) {
+                        $lastDraw = $row;
+                    }
                 }
             } catch (Exception $e) {
                 Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
-        return $finalStatistics;
+        return ['stats' => $finalStatistics, 'lastDraw' => $lastDraw];
     }
 
     private function getNextDrawDate()

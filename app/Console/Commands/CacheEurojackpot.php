@@ -36,7 +36,8 @@ class CacheEurojackpot extends Command
         $obj = resolve(EurojackpotService::class);
 
         Cache::forget('eurojackpot_draws');
-        $finalStatistics = $obj->load_files();
+        $output = $obj->load_files();
+        $finalStatistics = $output['stats'];
         Cache::put('eurojackpot_draws', $finalStatistics, now()->addDays(7));
 
 
