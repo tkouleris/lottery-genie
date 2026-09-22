@@ -208,35 +208,36 @@ class JokerService
         if($out) {
             return $out;
         }
-
-        $files = File::load_xlsx_files($folder);
-        $lastDraw = [];
-
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
-
-                foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3 ) {
-                        continue;
-                    }
-
-                    if(count($lastDraw) ==0) {
-                        $lastDraw = $row;
-                    }
-                    $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
-                    $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
-                    if($previous_date->lt($current_date)) {
-                        $lastDraw = $row;
-                    }
-                }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
-            }
-        }
+        $out = $this->load_files($folder);
+        $lastDraw = $out['lastDraw'];
+//        $files = File::load_xlsx_files($folder);
+//        $lastDraw = [];
+//
+//        foreach ($files as $file) {
+//            try {
+//                $spreadsheet = IOFactory::load($file);
+//                $worksheet = $spreadsheet->getActiveSheet();
+//                $rows = $worksheet->toArray();
+//
+//                foreach ($rows as $index => $row) {
+//                    // Skip header rows (first 3 rows) and non-numeric rows
+//                    if ($index < 3 ) {
+//                        continue;
+//                    }
+//
+//                    if(count($lastDraw) ==0) {
+//                        $lastDraw = $row;
+//                    }
+//                    $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
+//                    $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
+//                    if($previous_date->lt($current_date)) {
+//                        $lastDraw = $row;
+//                    }
+//                }
+//            } catch (Exception $e) {
+//                Log::error("Error reading file {$file}: " . $e->getMessage());
+//            }
+//        }
         if(count($lastDraw) ==0) {
             return [];
         }
@@ -255,6 +256,7 @@ class JokerService
         $files = File::load_xlsx_files($folder);
         $finalStatistics = [];
         $stats = [];
+        $lastDraw = [];
         foreach ($files as $file) {
             try {
                 $spreadsheet = IOFactory::load($file);
@@ -290,12 +292,21 @@ class JokerService
                             'joker' => $joker
                         ];
                     }
+
+                    if(count($lastDraw) ==0) {
+                        $lastDraw = $row;
+                    }
+                    $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
+                    $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
+                    if($previous_date->lt($current_date)) {
+                        $lastDraw = $row;
+                    }
                 }
             } catch (Exception $e) {
                 Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
-        return ['draws' => $finalStatistics, 'stats' => $stats];
+        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw];
     }
 
     private function getNextDrawDate()
