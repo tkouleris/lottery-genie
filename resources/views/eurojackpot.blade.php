@@ -33,6 +33,17 @@
                         </div>
                     @endforeach
                 </div>
+
+                <div class="flex justify-center">
+                    <a href="{{ route('eurojackpot.checker', ['numbers' => $draw['numbers'], 'jokers' => $draw['jokers']]) }}"
+                       target="_blank"
+                       class="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-blue-400 hover:text-blue-300 px-6 py-2 rounded-full text-sm font-bold transition-all border border-slate-600 hover:border-blue-400/50 shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                        Check Combination
+                    </a>
+                </div>
             </div>
         </div>
     @endforeach
