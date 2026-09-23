@@ -62,4 +62,29 @@ class DrawsController extends Controller
         $stats = $lottoService->getStats();
         return view('lotto-stats', compact('stats'));
     }
+
+    public function eurojackpot_checker(Request $request, EurojackpotService $eurojackpotService)
+    {
+        $results = null;
+        $userNumbers = $request->input('numbers', []);
+        $userJokers = $request->input('jokers', []);
+
+        if (!empty($userNumbers) && !empty($userJokers)) {
+            $request->validate([
+                'numbers' => 'required|array|size:5',
+                'numbers.*' => 'integer|min:1|max:50',
+                'jokers' => 'required|array|size:2',
+                'jokers.*' => 'integer|min:1|max:12',
+            ]);
+
+            // Ensure uniqueness
+            if (count(array_unique($userNumbers)) !== 5 || count(array_unique($userJokers)) !== 2) {
+                return back()->withErrors('Numbers must be unique.');
+            }
+
+            $results = $eurojackpotService->checkCombination($userNumbers, $userJokers);
+        }
+
+        return view('eurojackpot-checker', compact('results', 'userNumbers', 'userJokers'));
+    }
 }
