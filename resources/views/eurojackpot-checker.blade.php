@@ -107,25 +107,11 @@
                 @endif
 
                 <!-- Statistics Summary -->
-                <div class="grid md:grid-cols-3 gap-6">
+                <div class="grid md:grid-cols-1 gap-6">
                     <div class="card-glass p-6 rounded-3xl text-center">
                         <h4 class="text-slate-400 text-sm uppercase mb-2">Total Draws Checked</h4>
                         <div class="text-3xl font-bold">{{ $results['total_draws'] }}</div>
                         <p class="text-xs text-slate-500 mt-1">{{ $results['date_range']['start'] }} to {{ $results['date_range']['end'] }}</p>
-                    </div>
-                    <div class="card-glass p-6 rounded-3xl text-center md:col-span-2">
-                        <h4 class="text-slate-400 text-sm uppercase mb-4">Historical Partial Matches</h4>
-                        <div class="flex flex-wrap gap-4 justify-center">
-                            @php
-                                $tiers = ['5+2', '5+1', '5+0', '4+2', '4+1', '4+0', '3+2', '3+1', '3+0'];
-                            @endphp
-                            @foreach($tiers as $tier)
-                                <div class="px-4 py-2 bg-slate-800/50 rounded-xl border border-slate-700">
-                                    <span class="text-blue-400 font-bold">{{ $tier }}:</span>
-                                    <span class="ml-1">{{ $results['breakdown'][$tier] ?? 0 }}</span>
-                                </div>
-                            @endforeach
-                        </div>
                     </div>
                 </div>
 
