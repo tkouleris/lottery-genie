@@ -211,6 +211,9 @@
                     this.selectedNumbers = [];
                     this.selectedJokers = [];
                     this.error = '';
+                    if (window.location.search) {
+                        window.location.href = window.location.pathname;
+                    }
                 },
 
                 validateForm(e) {
