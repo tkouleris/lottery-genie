@@ -12,7 +12,7 @@
     <div x-data="checkerApp()" class="space-y-8">
         <!-- Input Section -->
         <section class="card-glass rounded-3xl p-8">
-            <form action="{{ route('eurojackpot.checker') }}" method="GET" @submit="validateForm($event)">
+            <form id="checker-form" action="{{ route('eurojackpot.checker') }}" method="GET" @submit.prevent="validateForm($event)">
                 @if($results)
                     <!-- Display Selected Numbers -->
                     <div class="text-center mb-8">
@@ -240,8 +240,14 @@
 
                 validateForm(e) {
                     if (this.selectedNumbers.length !== 5 || this.selectedJokers.length !== 2) {
-                        e.preventDefault();
                         this.error = 'Please select exactly 5 main numbers and 2 Eurozahlen.';
+                    } else {
+                        const overlay = document.getElementById('loading-overlay');
+                        if (overlay) overlay.classList.remove('hidden');
+
+                        // We need to submit the form. Since we are in @submit.prevent,
+                        // calling e.target.submit() is appropriate.
+                        e.target.submit();
                     }
                 }
             }

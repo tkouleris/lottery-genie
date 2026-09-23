@@ -114,7 +114,11 @@
             const overlay = document.getElementById('loading-overlay');
 
             forms.forEach(form => {
-                form.addEventListener('submit', function() {
+                if (form.id === 'checker-form') return;
+                form.addEventListener('submit', function(e) {
+                    if (e.defaultPrevented) {
+                        return;
+                    }
                     overlay.classList.remove('hidden');
                 });
             });
