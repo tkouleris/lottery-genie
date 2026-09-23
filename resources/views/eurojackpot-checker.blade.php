@@ -13,37 +13,57 @@
         <!-- Input Section -->
         <section class="card-glass rounded-3xl p-8">
             <form action="{{ route('eurojackpot.checker') }}" method="GET" @submit="validateForm($event)">
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Main Numbers Selection -->
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4 text-blue-400">Main Numbers (Select 5)</h3>
-                        <div class="grid grid-cols-10 gap-2">
-                            <template x-for="n in 50">
-                                <button type="button"
-                                    @click="toggleNumber(n)"
-                                    :class="isSelected(n) ? 'bg-blue-500 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
-                                    class="w-8 h-8 rounded-full text-xs font-bold transition-colors flex items-center justify-center"
-                                    x-text="n">
-                                </button>
-                            </template>
+                @if($results)
+                    <!-- Display Selected Numbers -->
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl font-semibold mb-6 text-slate-300">Your Combination</h3>
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            @foreach($userNumbers as $n)
+                                <div class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-blue-500/20">
+                                    {{ $n }}
+                                </div>
+                            @endforeach
+                            <div class="w-px h-12 bg-slate-700 mx-2"></div>
+                            @foreach($userJokers as $j)
+                                <div class="w-12 h-12 rounded-full bg-yellow-500 text-slate-900 flex items-center justify-center text-xl font-bold shadow-lg shadow-yellow-500/20">
+                                    {{ $j }}
+                                </div>
+                            @endforeach
                         </div>
                     </div>
+                @else
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Main Numbers Selection -->
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 text-blue-400">Main Numbers (Select 5)</h3>
+                            <div class="grid grid-cols-10 gap-2">
+                                <template x-for="n in 50">
+                                    <button type="button"
+                                        @click="toggleNumber(n)"
+                                        :class="isSelected(n) ? 'bg-blue-500 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
+                                        class="w-8 h-8 rounded-full text-xs font-bold transition-colors flex items-center justify-center"
+                                        x-text="n">
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
 
-                    <!-- Eurozahlen Selection -->
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4 text-yellow-400">Eurozahlen (Select 2)</h3>
-                        <div class="grid grid-cols-6 gap-2">
-                            <template x-for="n in 12">
-                                <button type="button"
-                                    @click="toggleJoker(n)"
-                                    :class="isJokerSelected(n) ? 'bg-yellow-500 text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
-                                    class="w-10 h-10 rounded-full text-sm font-bold transition-colors flex items-center justify-center"
-                                    x-text="n">
-                                </button>
-                            </template>
+                        <!-- Eurozahlen Selection -->
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-400">Eurozahlen (Select 2)</h3>
+                            <div class="grid grid-cols-6 gap-2">
+                                <template x-for="n in 12">
+                                    <button type="button"
+                                        @click="toggleJoker(n)"
+                                        :class="isJokerSelected(n) ? 'bg-yellow-500 text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
+                                        class="w-10 h-10 rounded-full text-sm font-bold transition-colors flex items-center justify-center"
+                                        x-text="n">
+                                    </button>
+                                </template>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
 
                 <!-- Hidden Inputs for Form Submission -->
                 <template x-for="n in selectedNumbers">
@@ -54,14 +74,16 @@
                 </template>
 
                 <div class="mt-8 flex flex-wrap gap-4 justify-center">
-                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-500 hover:to-blue-300 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-all transform hover:scale-105">
-                        Check Combination
-                    </button>
-                    <button type="button" @click="quickPick()" class="bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-full font-bold transition-all">
-                        Quick Pick / Randomize
-                    </button>
-                    <button type="button" @click="reset()" class="text-slate-400 hover:text-white px-4 py-3 transition-colors">
-                        Clear / Reset
+                    @if(!$results)
+                        <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-500 hover:to-blue-300 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-all transform hover:scale-105">
+                            Check Combination
+                        </button>
+                        <button type="button" @click="quickPick()" class="bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-full font-bold transition-all">
+                            Quick Pick / Randomize
+                        </button>
+                    @endif
+                    <button type="button" @click="reset()" class="text-slate-400 hover:text-white px-4 py-3 transition-colors {{ $results ? 'bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-full font-bold' : '' }}">
+                        {{ $results ? 'Check Another Combination' : 'Clear / Reset' }}
                     </button>
                 </div>
 
