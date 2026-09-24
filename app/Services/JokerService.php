@@ -266,6 +266,7 @@ class JokerService
                         $joker = intval($drawData[5]);
                         sort($numbers);
                         $stats[] = [
+                            'date' => $row[1],
                             'numbers' => $numbers,
                             'joker' => $joker
                         ];
@@ -285,6 +286,58 @@ class JokerService
             }
         }
         return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw];
+    }
+
+    public function checkCombination(array $userNumbers, array $userJokers): array
+    {
+        $allData = $this->load_files();
+        $history = $allData['stats'];
+
+        sort($userNumbers);
+        // Joker for Joker game is usually just one number, but we'll handle it as array for consistency
+        sort($userJokers);
+
+        $results = [
+            'exact_matches' => 0,
+            'breakdown' => [],
+            'match_history' => [],
+            'total_draws' => count($history),
+            'date_range' => [
+                'start' => !empty($history) ? end($history)['date'] : null,
+                'end' => !empty($history) ? $history[0]['date'] : null,
+            ]
+        ];
+
+        foreach ($history as $draw) {
+            $matchingNumbers = array_intersect($userNumbers, $draw['numbers']);
+            // In Joker, user picks 1 joker. The service usually returns 1 joker.
+            $drawJoker = [$draw['joker']];
+            $matchingJokers = array_intersect($userJokers, $drawJoker);
+
+            $numCount = count($matchingNumbers);
+            $jokerCount = count($matchingJokers);
+
+            if ($numCount === 5 && $jokerCount === 1) {
+                $results['exact_matches']++;
+            }
+
+            // Joker tiers: 5+1, 5, 4+1, 4, 3+1, 3, 2+1, 1+1
+            if (($numCount === 5) || ($numCount >= 1 && $jokerCount === 1) || ($numCount >= 3)) {
+                $tier = "{$numCount}+{$jokerCount}";
+                $results['breakdown'][$tier] = ($results['breakdown'][$tier] ?? 0) + 1;
+
+                $results['match_history'][] = [
+                    'date' => $draw['date'],
+                    'numbers' => $draw['numbers'],
+                    'jokers' => $drawJoker,
+                    'matching_numbers' => $matchingNumbers,
+                    'matching_jokers' => $matchingJokers,
+                    'tier' => $tier
+                ];
+            }
+        }
+
+        return $results;
     }
 
     private function getNextDrawDate()
