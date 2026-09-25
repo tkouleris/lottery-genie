@@ -26,6 +26,7 @@ Route::get('/joker/stats', [DrawsController::class, 'joker_stats'])->name('joker
 Route::get('/joker/checker', [DrawsController::class, 'joker_checker'])->name('joker.checker');
 Route::get('/lotto', [DrawsController::class, 'draw_lotto'])->name('lotto');
 Route::get('/lotto/stats', [DrawsController::class, 'lotto_stats'])->name('lotto.stats');
+Route::get('/lotto/checker', [DrawsController::class, 'lotto_checker'])->name('lotto.checker');
 Route::get('/about', function () {
     return view('about');
 })->name('about');

@@ -258,6 +258,7 @@ class LottoService
                         $numbers = array_map('intval', array_slice($drawData, 0, 6));
                         sort($numbers);
                         $stats[] = [
+                            'date' => $row[1],
                             'numbers' => $numbers
                         ];
                     }
@@ -277,6 +278,49 @@ class LottoService
             }
         }
         return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw];
+    }
+
+    public function checkCombination(array $userNumbers): array
+    {
+        $allData = $this->load_files();
+        $history = $allData['stats'];
+
+        sort($userNumbers);
+
+        $results = [
+            'exact_matches' => 0,
+            'breakdown' => [],
+            'match_history' => [],
+            'total_draws' => count($history),
+            'date_range' => [
+                'start' => !empty($history) ? end($history)['date'] : null,
+                'end' => !empty($history) ? $history[0]['date'] : null,
+            ]
+        ];
+
+        foreach ($history as $draw) {
+            $matchingNumbers = array_intersect($userNumbers, $draw['numbers']);
+            $numCount = count($matchingNumbers);
+
+            if ($numCount === 6) {
+                $results['exact_matches']++;
+            }
+
+            // Lotto tiers: 6, 5, 4, 3
+            if ($numCount >= 3) {
+                $tier = (string)$numCount;
+                $results['breakdown'][$tier] = ($results['breakdown'][$tier] ?? 0) + 1;
+
+                $results['match_history'][] = [
+                    'date' => $draw['date'],
+                    'numbers' => $draw['numbers'],
+                    'matching_numbers' => $matchingNumbers,
+                    'tier' => $tier
+                ];
+            }
+        }
+
+        return $results;
     }
 
     private function getNextDrawDate()

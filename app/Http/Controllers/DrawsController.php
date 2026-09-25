@@ -112,4 +112,26 @@ class DrawsController extends Controller
 
         return view('joker-checker', compact('results', 'userNumbers', 'userJokers'));
     }
+
+    public function lotto_checker(Request $request, LottoService $lottoService)
+    {
+        $results = null;
+        $userNumbers = $request->input('numbers', []);
+
+        if (!empty($userNumbers)) {
+            $request->validate([
+                'numbers' => 'required|array|size:6',
+                'numbers.*' => 'integer|min:1|max:49',
+            ]);
+
+            // Ensure uniqueness
+            if (count(array_unique($userNumbers)) !== 6) {
+                return back()->withErrors('Numbers must be unique.');
+            }
+
+            $results = $lottoService->checkCombination($userNumbers);
+        }
+
+        return view('lotto-checker', compact('results', 'userNumbers'));
+    }
 }

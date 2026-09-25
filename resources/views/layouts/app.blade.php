@@ -89,6 +89,7 @@
                          style="display: none;">
                         <a href="{{ route('lotto') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Predict</a>
                         <a href="{{ route('lotto.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Stats</a>
+                        <a href="{{ route('lotto.checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Checker</a>
                     </div>
                 </div>
                 <a href="{{ route('about') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">About</a>
