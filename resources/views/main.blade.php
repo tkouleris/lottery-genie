@@ -8,7 +8,11 @@
                 <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
                     <div>Draw #{{ $euro['id'] }} • {{ $euro['date'] }}</div>
-                    <div>Next Draw: {{ $euro['next_draw_date'] }}</div>
+                    @if(\Carbon\Carbon::now()->format('d/m/Y') == $euro['next_draw_date'])
+                        <div>Next Draw:<b> Today</b> </div>
+                    @else
+                        <div>Next Draw: {{ $euro['next_draw_date'] }}</div>
+                    @endif
                 </div>
             </header>
 
@@ -38,7 +42,11 @@
                 <img src="{{ asset('img/tzoker.jpg') }}" alt="Joker Logo" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
                     <div>Draw #{{ $joker['id'] }} • {{ $joker['date'] }}</div>
-                    <div>Next Draw: {{ $joker['next_draw_date'] }}</div>
+                    @if(\Carbon\Carbon::now()->format('d/m/Y') == $joker['next_draw_date'])
+                        <div><b>Today</b></div>
+                    @else
+                        <div>Next Draw: {{ $joker['next_draw_date'] }}</div>
+                    @endif
                 </div>
             </header>
 
@@ -68,7 +76,11 @@
                 <img src="{{ asset('img/lotto.jpg') }}" alt="Lotto Logo" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
                     <div>Draw #{{ $lotto['id'] }} • {{ $lotto['date'] }}</div>
-                    <div>Next Draw: {{ $lotto['next_draw_date'] }}</div>
+                    @if(\Carbon\Carbon::now()->format('d/m/Y') == $lotto['next_draw_date'])
+                        <div><b>Today</b></div>
+                    @else
+                        <div>Next Draw: {{ $lotto['next_draw_date'] }}</div>
+                    @endif
                 </div>
             </header>
 
