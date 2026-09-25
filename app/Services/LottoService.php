@@ -327,7 +327,7 @@ class LottoService
     {
         $now = Carbon::now();
         return collect([
-            Carbon::FRIDAY,
+            Carbon::SATURDAY,
             Carbon::WEDNESDAY,
         ])->map(fn ($day) => $now->copy()->next($day))
             ->sort()
