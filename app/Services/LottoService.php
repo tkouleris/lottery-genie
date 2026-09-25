@@ -325,7 +325,7 @@ class LottoService
 
     private function getNextDrawDate()
     {
-        $now = Carbon::now();
+        $now = Carbon::now()->subDays(1);
         return collect([
             Carbon::SATURDAY,
             Carbon::WEDNESDAY,

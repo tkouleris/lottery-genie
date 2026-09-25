@@ -342,7 +342,7 @@ class JokerService
 
     private function getNextDrawDate()
     {
-        $now = Carbon::now();
+        $now = Carbon::now()->subDays(1);
         return collect([
             Carbon::SUNDAY,
             Carbon::TUESDAY,
