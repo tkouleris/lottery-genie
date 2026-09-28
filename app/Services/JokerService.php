@@ -290,8 +290,12 @@ class JokerService
 
     public function checkCombination(array $userNumbers, array $userJokers): array
     {
-        $allData = $this->load_files();
-        $history = $allData['stats'];
+        $history = Cache::get('joker_stats');
+        if(is_null($history)) {
+            $output = $this->load_files('stats/joker');
+            $history = $output['stats'];
+        }
+
 
         sort($userNumbers);
         // Joker for Joker game is usually just one number, but we'll handle it as array for consistency
