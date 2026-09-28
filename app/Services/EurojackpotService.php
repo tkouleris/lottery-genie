@@ -328,49 +328,6 @@ class EurojackpotService
             $history = $output['history'];
         }
 
-//        $allDraws = $this->load_files();
-//        $stats = $allDraws['stats'];
-//        $rawRows = $allDraws['lastDraw']; // This is just one row, we need all rows to get dates
-//        $history = $allDraws['history'];
-        // Actually load_files needs to return all rows with dates for history
-        // Let's refine load_files or use a local version here to get dates
-//        $files = File::load_xlsx_files('stats/euro');
-//        $history = [];
-//
-//        foreach ($files as $file) {
-//            try {
-//                $spreadsheet = IOFactory::load($file);
-//                $worksheet = $spreadsheet->getActiveSheet();
-//                $rows = $worksheet->toArray();
-//                foreach ($rows as $index => $row) {
-//                    if ($index < 3) continue;
-//
-//                    $drawNumbers = [];
-//                    for ($i = 2; $i <= 6; $i++) {
-//                        if (isset($row[$i]) && is_numeric($row[$i])) {
-//                            $drawNumbers[] = (int)$row[$i];
-//                        }
-//                    }
-//                    $drawJokers = [];
-//                    for ($i = 7; $i <= 8; $i++) {
-//                        if (isset($row[$i]) && is_numeric($row[$i])) {
-//                            $drawJokers[] = (int)$row[$i];
-//                        }
-//                    }
-//
-//                    if (count($drawNumbers) === 5 && count($drawJokers) === 2) {
-//                        $history[] = [
-//                            'date' => $row[1],
-//                            'numbers' => $drawNumbers,
-//                            'jokers' => $drawJokers
-//                        ];
-//                    }
-//                }
-//            } catch (Exception $e) {
-//                Log::error("Error reading file {$file} in checkCombination: " . $e->getMessage());
-//            }
-//        }
-
         sort($userNumbers);
         sort($userJokers);
 
