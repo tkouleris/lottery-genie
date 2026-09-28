@@ -282,8 +282,11 @@ class LottoService
 
     public function checkCombination(array $userNumbers): array
     {
-        $allData = $this->load_files();
-        $history = $allData['stats'];
+        $history = Cache::get('lotto_stats');
+        if(is_null($history)) {
+            $output = $this->load_files();
+            $history = $output['stats'];
+        }
 
         sort($userNumbers);
 
