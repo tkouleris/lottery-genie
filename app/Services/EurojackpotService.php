@@ -251,6 +251,7 @@ class EurojackpotService
         $files = File::load_xlsx_files($folder);
         $finalStatistics = [];
         $lastDraw = [];
+        $history = [];
         foreach ($files as $file) {
             try {
                 $spreadsheet = IOFactory::load($file);
@@ -285,37 +286,6 @@ class EurojackpotService
                     if($previous_date->lt($current_date)) {
                         $lastDraw = $row;
                     }
-                }
-            } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
-            }
-        }
-        return ['stats' => $finalStatistics, 'lastDraw' => $lastDraw];
-    }
-
-    /**
-     * @param array $userNumbers 5 main numbers
-     * @param array $userJokers 2 eurozahlen
-     * @return array
-     */
-    public function checkCombination(array $userNumbers, array $userJokers): array
-    {
-        $allDraws = $this->load_files();
-        $stats = $allDraws['stats'];
-        $rawRows = $allDraws['lastDraw']; // This is just one row, we need all rows to get dates
-
-        // Actually load_files needs to return all rows with dates for history
-        // Let's refine load_files or use a local version here to get dates
-        $files = File::load_xlsx_files('stats/euro');
-        $history = [];
-
-        foreach ($files as $file) {
-            try {
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $rows = $worksheet->toArray();
-                foreach ($rows as $index => $row) {
-                    if ($index < 3) continue;
 
                     $drawNumbers = [];
                     for ($i = 2; $i <= 6; $i++) {
@@ -339,9 +309,67 @@ class EurojackpotService
                     }
                 }
             } catch (Exception $e) {
-                Log::error("Error reading file {$file} in checkCombination: " . $e->getMessage());
+                Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
+        return ['stats' => $finalStatistics, 'lastDraw' => $lastDraw, 'history' => $history];
+    }
+
+    /**
+     * @param array $userNumbers 5 main numbers
+     * @param array $userJokers 2 eurozahlen
+     * @return array
+     */
+    public function checkCombination(array $userNumbers, array $userJokers): array
+    {
+        $history = Cache::get('eurojackpot_history');
+        if(is_null($history)) {
+            $output = $this->load_files();
+            $history = $output['history'];
+        }
+
+//        $allDraws = $this->load_files();
+//        $stats = $allDraws['stats'];
+//        $rawRows = $allDraws['lastDraw']; // This is just one row, we need all rows to get dates
+//        $history = $allDraws['history'];
+        // Actually load_files needs to return all rows with dates for history
+        // Let's refine load_files or use a local version here to get dates
+//        $files = File::load_xlsx_files('stats/euro');
+//        $history = [];
+//
+//        foreach ($files as $file) {
+//            try {
+//                $spreadsheet = IOFactory::load($file);
+//                $worksheet = $spreadsheet->getActiveSheet();
+//                $rows = $worksheet->toArray();
+//                foreach ($rows as $index => $row) {
+//                    if ($index < 3) continue;
+//
+//                    $drawNumbers = [];
+//                    for ($i = 2; $i <= 6; $i++) {
+//                        if (isset($row[$i]) && is_numeric($row[$i])) {
+//                            $drawNumbers[] = (int)$row[$i];
+//                        }
+//                    }
+//                    $drawJokers = [];
+//                    for ($i = 7; $i <= 8; $i++) {
+//                        if (isset($row[$i]) && is_numeric($row[$i])) {
+//                            $drawJokers[] = (int)$row[$i];
+//                        }
+//                    }
+//
+//                    if (count($drawNumbers) === 5 && count($drawJokers) === 2) {
+//                        $history[] = [
+//                            'date' => $row[1],
+//                            'numbers' => $drawNumbers,
+//                            'jokers' => $drawJokers
+//                        ];
+//                    }
+//                }
+//            } catch (Exception $e) {
+//                Log::error("Error reading file {$file} in checkCombination: " . $e->getMessage());
+//            }
+//        }
 
         sort($userNumbers);
         sort($userJokers);
