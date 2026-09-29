@@ -175,10 +175,14 @@ class EurojackpotService
 
         $jokerPairsFrequency = [];
         $even_odd_freq = [];
+        $last_date = null;
         foreach ($delays as $drawIndex => $draw) {
+            $last_date = $draw['date'];
+
+            $numbers = $draw['numbers'];
             for ($i = 0; $i < 5; $i++) {
-                if (isset($draw[$i]) && $draw[$i] >= 1 && $draw[$i] <= 50) {
-                    $num = $draw[$i];
+                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 50) {
+                    $num = $numbers[$i];
 
                     if (!$numbersFound[$num]) {
                         $numberDelay[$num] = $drawIndex;
@@ -186,10 +190,10 @@ class EurojackpotService
                     }
                 }
             }
-
-            for ($i = 5; $i <= 6; $i++) {
-                if (isset($draw[$i]) && $draw[$i] >= 1 && $draw[$i] <= 12) {
-                    $jokerNum = $draw[$i];
+            $jokers = $draw['jokers'];
+            for ($i = 0; $i <= 1; $i++) {
+                if (isset($jokers[$i]) && $jokers[$i] >= 1 && $jokers[$i] <= 12) {
+                    $jokerNum = $jokers[$i];
                     if (!$jokersFound[$jokerNum]) {
                         $jokerDelay[$jokerNum] = $drawIndex;
                         $jokersFound[$jokerNum] = true;
@@ -197,6 +201,7 @@ class EurojackpotService
                 }
             }
         }
+//        dd($last_date, $jokers, $numbers);
         foreach ($allDraws as $drawIndex => $draw) {
             $evenCount = 0;
             $oddCount = 0;
@@ -316,6 +321,7 @@ class EurojackpotService
 //        rsort($files);
 
         foreach ($files as $file) {
+
             try {
                 $spreadsheet = IOFactory::load($file);
                 $worksheet = $spreadsheet->getActiveSheet();
@@ -324,11 +330,12 @@ class EurojackpotService
 //                rsort($rows);
 
                 foreach ($rows as $index => $row) {
+
                     // Skip header rows (first 3 rows) and non-numeric rows
                     if ($index < 3 ) {
                         continue;
                     }
-
+//                    dd($row);
                     // The numbers start 2 columns after the date (which is at index 1)
                     // So numbers are at indices 2, 3, 4, 5, 6
                     // Eurozahlen are at indices 7, 8
@@ -383,7 +390,7 @@ class EurojackpotService
             }
         }
         $delays = collect($delays)
-            ->sortBy(fn ($delay) => Carbon::parse($delay['date']))
+            ->sortByDesc(fn ($delay) => Carbon::parse($delay['date']))
             ->values();
         return ['stats' => $finalStatistics, 'lastDraw' => $lastDraw, 'history' => $history, 'delays' => $delays];
     }
