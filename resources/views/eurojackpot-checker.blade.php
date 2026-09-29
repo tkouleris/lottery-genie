@@ -127,7 +127,7 @@
                                 <thead class="bg-slate-800/50 text-slate-400 text-sm">
                                     <tr>
                                         <th class="px-6 py-4">Draw Date</th>
-                                        <th class="px-6 py-4">Drawn Numbers</th>
+                                        <th class="px-6 py-4">Drawn Numbers & Eurozahlen</th>
                                         <th class="px-6 py-4">Prize Tier</th>
                                     </tr>
                                 </thead>

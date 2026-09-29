@@ -28,9 +28,9 @@
                 @endforeach
             </div>
         </section>
-        <!-- Joker Frequency -->
+        <!-- Eurozahlen Frequency -->
         <section class="card-glass rounded-3xl p-8">
-            <h2 class="text-2xl font-bold mb-6 text-yellow-400">Joker Frequency (1-12)</h2>
+            <h2 class="text-2xl font-bold mb-6 text-yellow-400">Eurozahlen Frequency (1-12)</h2>
             <div class="grid grid-cols-4 gap-4">
                 @foreach($stats['joker_frequency'] as $num => $count)
                     <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
@@ -91,9 +91,9 @@
                 </div>
             </section>
 
-            <!-- Common Joker Combinations -->
+            <!-- Common Eurozahlen Combinations -->
             <section class="card-glass rounded-3xl p-8">
-                <h2 class="text-2xl font-bold mb-6 text-pink-400">Top Joker Pairs</h2>
+                <h2 class="text-2xl font-bold mb-6 text-pink-400">Top Eurozahlen Pairs</h2>
                 <div class="space-y-4">
                     @foreach($stats['common_joker_combinations'] as $pair => $count)
                         <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/50">

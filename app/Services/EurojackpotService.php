@@ -194,7 +194,7 @@ class EurojackpotService
             $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
 
             $jokers = [];
-            // Jokers are at indices 5-6
+            // Eurozahlen are at indices 5-6
             for ($i = 5; $i <= 6; $i++) {
                 if (isset($draw[$i]) && $draw[$i] >= 1 && $draw[$i] <= 12) {
                     $jokerNum = $draw[$i];
@@ -299,7 +299,7 @@ class EurojackpotService
 
                     // The numbers start 2 columns after the date (which is at index 1)
                     // So numbers are at indices 2, 3, 4, 5, 6
-                    // Jokers are at indices 7, 8
+                    // Eurozahlen are at indices 7, 8
                     $drawData = [];
                     for ($i = 2; $i <= 8; $i++) {
                         if (isset($row[$i]) && is_numeric($row[$i])) {
@@ -350,7 +350,7 @@ class EurojackpotService
 
     /**
      * @param array $userNumbers 5 main numbers
-     * @param array $userJokers 2 eurozahlen
+     * @param array $userJokers 2 Eurozahlen
      * @return array
      */
     public function checkCombination(array $userNumbers, array $userJokers): array

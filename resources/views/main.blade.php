@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="grid gap-8 md:grid-cols-3 items-stretch">
-        <!-- Eurojackpot Section -->
+        <!-- Eurozahlen Section -->
         <div class="flex flex-col mb-8 md:mb-0">
             <header class="text-center mb-3">
                 <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
