@@ -30,6 +30,7 @@ class EuroJackpotStats extends Command
     {
 //        https://media.opap.gr/Excel/5104/Joker_2019.xls?utm_source=chatgpt.com
         $obj = resolve(EurojackpotService::class);
+        $obj->load_files();
         $output = $obj->run();
         dd($output);
         return 0;

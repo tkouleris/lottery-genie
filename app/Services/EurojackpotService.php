@@ -151,14 +151,20 @@ class EurojackpotService
     public function get_stats(string $folder = 'stats/euro'): array
     {
         $allDraws = Cache::get('eurojackpot_stats');
-        if(is_null($allDraws)) {
+        $delays = null;
+        if (is_null($allDraws)) {
             $output = $this->load_files();
             $allDraws = $output['stats'];
+            $delays = $output['delays'];
         }
 
         if (empty($allDraws)) {
             throw new Exception("No data found for statistics.");
         }
+
+        // The draws are loaded in chronological order (oldest to newest)
+        // We reverse them so that the first element is the most recent draw (delay 0)
+        $allDraws = array_reverse($allDraws);
 
         $numberFrequency = array_fill(1, 50, 0);
         $jokerFrequency = array_fill(1, 12, 0);
@@ -169,7 +175,28 @@ class EurojackpotService
 
         $jokerPairsFrequency = [];
         $even_odd_freq = [];
+        foreach ($delays as $drawIndex => $draw) {
+            for ($i = 0; $i < 5; $i++) {
+                if (isset($draw[$i]) && $draw[$i] >= 1 && $draw[$i] <= 50) {
+                    $num = $draw[$i];
 
+                    if (!$numbersFound[$num]) {
+                        $numberDelay[$num] = $drawIndex;
+                        $numbersFound[$num] = true;
+                    }
+                }
+            }
+
+            for ($i = 5; $i <= 6; $i++) {
+                if (isset($draw[$i]) && $draw[$i] >= 1 && $draw[$i] <= 12) {
+                    $jokerNum = $draw[$i];
+                    if (!$jokersFound[$jokerNum]) {
+                        $jokerDelay[$jokerNum] = $drawIndex;
+                        $jokersFound[$jokerNum] = true;
+                    }
+                }
+            }
+        }
         foreach ($allDraws as $drawIndex => $draw) {
             $evenCount = 0;
             $oddCount = 0;
@@ -184,10 +211,10 @@ class EurojackpotService
                         $oddCount++;
                     }
 
-                    if (!$numbersFound[$num]) {
-                        $numberDelay[$num] = $drawIndex;
-                        $numbersFound[$num] = true;
-                    }
+//                    if (!$numbersFound[$num]) {
+//                        $numberDelay[$num] = $drawIndex;
+//                        $numbersFound[$num] = true;
+//                    }
                 }
             }
             $evenOddKey = "{$evenCount} even / {$oddCount} odd";
@@ -201,10 +228,10 @@ class EurojackpotService
                     $jokerFrequency[$jokerNum]++;
                     $jokers[] = $jokerNum;
 
-                    if (!$jokersFound[$jokerNum]) {
-                        $jokerDelay[$jokerNum] = $drawIndex;
-                        $jokersFound[$jokerNum] = true;
-                    }
+//                    if (!$jokersFound[$jokerNum]) {
+//                        $jokerDelay[$jokerNum] = $drawIndex;
+//                        $jokersFound[$jokerNum] = true;
+//                    }
                 }
             }
 
@@ -285,11 +312,16 @@ class EurojackpotService
         $finalStatistics = [];
         $lastDraw = [];
         $history = [];
+        $delays = [];
+//        rsort($files);
+
         foreach ($files as $file) {
             try {
                 $spreadsheet = IOFactory::load($file);
                 $worksheet = $spreadsheet->getActiveSheet();
                 $rows = $worksheet->toArray();
+//                $rows = array_slice($rows, 3);
+//                rsort($rows);
 
                 foreach ($rows as $index => $row) {
                     // Skip header rows (first 3 rows) and non-numeric rows
@@ -339,13 +371,21 @@ class EurojackpotService
                             'numbers' => $drawNumbers,
                             'jokers' => $drawJokers
                         ];
+                        $delays[] = [
+                            'date' => Carbon::createFromFormat('d/m/Y', $row[1]),
+                            'numbers' => $drawNumbers,
+                            'jokers' => $drawJokers
+                        ];
                     }
                 }
             } catch (Exception $e) {
                 Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
-        return ['stats' => $finalStatistics, 'lastDraw' => $lastDraw, 'history' => $history];
+        $delays = collect($delays)
+            ->sortBy(fn ($delay) => Carbon::parse($delay['date']))
+            ->values();
+        return ['stats' => $finalStatistics, 'lastDraw' => $lastDraw, 'history' => $history, 'delays' => $delays];
     }
 
     /**
