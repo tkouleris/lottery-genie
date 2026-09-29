@@ -162,19 +162,31 @@ class EurojackpotService
 
         $numberFrequency = array_fill(1, 50, 0);
         $jokerFrequency = array_fill(1, 12, 0);
+        $numberDelay = array_fill(1, 50, 0);
+        $jokerDelay = array_fill(1, 12, 0);
+        $numbersFound = array_fill(1, 50, false);
+        $jokersFound = array_fill(1, 12, false);
+
         $jokerPairsFrequency = [];
         $even_odd_freq = [];
 
-        foreach ($allDraws as $draw) {
+        foreach ($allDraws as $drawIndex => $draw) {
             $evenCount = 0;
             $oddCount = 0;
+            // Main numbers are at indices 0-4
             for ($i = 0; $i < 5; $i++) {
                 if (isset($draw[$i]) && $draw[$i] >= 1 && $draw[$i] <= 50) {
-                    $numberFrequency[$draw[$i]]++;
-                    if ($draw[$i] % 2 === 0) {
+                    $num = $draw[$i];
+                    $numberFrequency[$num]++;
+                    if ($num % 2 === 0) {
                         $evenCount++;
                     } else {
                         $oddCount++;
+                    }
+
+                    if (!$numbersFound[$num]) {
+                        $numberDelay[$num] = $drawIndex;
+                        $numbersFound[$num] = true;
                     }
                 }
             }
@@ -182,10 +194,17 @@ class EurojackpotService
             $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
 
             $jokers = [];
+            // Jokers are at indices 5-6
             for ($i = 5; $i <= 6; $i++) {
                 if (isset($draw[$i]) && $draw[$i] >= 1 && $draw[$i] <= 12) {
-                    $jokerFrequency[$draw[$i]]++;
-                    $jokers[] = $draw[$i];
+                    $jokerNum = $draw[$i];
+                    $jokerFrequency[$jokerNum]++;
+                    $jokers[] = $jokerNum;
+
+                    if (!$jokersFound[$jokerNum]) {
+                        $jokerDelay[$jokerNum] = $drawIndex;
+                        $jokersFound[$jokerNum] = true;
+                    }
                 }
             }
 
@@ -199,6 +218,18 @@ class EurojackpotService
             }
         }
 
+        // For numbers not found in history, delay is equal to total draws
+        foreach ($numbersFound as $num => $found) {
+            if (!$found) {
+                $numberDelay[$num] = count($allDraws);
+            }
+        }
+        foreach ($jokersFound as $num => $found) {
+            if (!$found) {
+                $jokerDelay[$num] = count($allDraws);
+            }
+        }
+
         arsort($numberFrequency);
         arsort($jokerFrequency);
         arsort($jokerPairsFrequency);
@@ -207,6 +238,8 @@ class EurojackpotService
         return [
             'number_frequency' => $numberFrequency,
             'joker_frequency' => $jokerFrequency,
+            'number_delay' => $numberDelay,
+            'joker_delay' => $jokerDelay,
             'common_joker_combinations' => array_slice($jokerPairsFrequency, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
             'total_draws_analyzed' => count($allDraws),
