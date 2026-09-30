@@ -6,6 +6,7 @@ use App\Helpers\File;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -34,7 +35,7 @@ class JokerService
         return $this->calculateStatistics($draws, $delays, $folder);
     }
 
-    private function calculateStatistics(array $draws, array $delays, string $folder): array
+    private function calculateStatistics(array $draws, Collection $delays, string $folder): array
     {
         $medians = [];
         $jokers = [];
@@ -71,6 +72,7 @@ class JokerService
             }
         }
 
+        $jokers = [];
         foreach ($draws as $draw) {
             $numbers = $draw['numbers']; // Ήδη ταξινομημένα
             $joker = $draw['joker'];
