@@ -55,7 +55,7 @@
                             <div class="ball number-ball w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold text-slate-900 mb-1">
                                 {{ $num }}
                             </div>
-                            <span class="text-xs {{ $delay > 20 ? 'text-red-400 font-bold' : 'text-slate-400' }}">{{ $delay }} dr.</span>
+                            <span class="text-xs {{ $delay <= 4 ? 'text-green-400' : ($delay >= 5 && $delay <= 10 ? 'text-yellow-400' : ($delay > 10 ? 'text-red-400 font-bold' : 'text-slate-400')) }}">{{ $delay }} dr.</span>
                         </div>
                     @endforeach
                 </div>
@@ -69,7 +69,7 @@
                             <div class="ball joker-ball w-10 h-10 flex items-center justify-center rounded-full text-lg font-bold mb-1">
                                 {{ $num }}
                             </div>
-                            <span class="text-xs {{ $delay > 10 ? 'text-red-400 font-bold' : 'text-slate-400' }}">{{ $delay }} dr.</span>
+                            <span class="text-xs {{ $delay < 4 ? 'text-green-400' : ($delay >= 5 && $delay <= 9 ? 'text-yellow-400' : ($delay > 10 ? 'text-red-400 font-bold' : 'text-slate-400')) }}">{{ $delay }} dr.</span>
                         </div>
                     @endforeach
                 </div>

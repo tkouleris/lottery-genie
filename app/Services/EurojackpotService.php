@@ -216,10 +216,6 @@ class EurojackpotService
                         $oddCount++;
                     }
 
-//                    if (!$numbersFound[$num]) {
-//                        $numberDelay[$num] = $drawIndex;
-//                        $numbersFound[$num] = true;
-//                    }
                 }
             }
             $evenOddKey = "{$evenCount} even / {$oddCount} odd";
@@ -233,10 +229,6 @@ class EurojackpotService
                     $jokerFrequency[$jokerNum]++;
                     $jokers[] = $jokerNum;
 
-//                    if (!$jokersFound[$jokerNum]) {
-//                        $jokerDelay[$jokerNum] = $drawIndex;
-//                        $jokersFound[$jokerNum] = true;
-//                    }
                 }
             }
 
