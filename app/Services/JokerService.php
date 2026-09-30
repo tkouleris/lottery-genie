@@ -37,21 +37,16 @@ class JokerService
 
     private function calculateStatistics(array $draws, Collection $delays, string $folder): array
     {
-        $medians = [];
         $jokers = [];
-        $numbers_freq = [];
-        $even_odd_freq = [];
-        $totalDraws = count($draws);
-        $numberDelay = array_fill(1, 50, 0);
-        $jokerDelay = array_fill(1, 12, 0);
-        $numbersFound = array_fill(1, 50, false);
-        $jokersFound = array_fill(1, 12, false);
+        $numberDelay = array_fill(1, 45, 0);
+        $jokerDelay = array_fill(1, 20, 0);
+        $numbersFound = array_fill(1, 45, false);
+        $jokersFound = array_fill(1, 20, false);
 
         foreach ($delays as $drawIndex => $draw) {
-
             $numbers = $draw['numbers'];
             for ($i = 0; $i < 5; $i++) {
-                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 50) {
+                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 45) {
                     $num = $numbers[$i];
 
                     if (!$numbersFound[$num]) {
@@ -60,19 +55,22 @@ class JokerService
                     }
                 }
             }
-            $jokers = $draw['jokers'];
-            for ($i = 0; $i <= 1; $i++) {
-                if (isset($jokers[$i]) && $jokers[$i] >= 1 && $jokers[$i] <= 12) {
-                    $jokerNum = $jokers[$i];
-                    if (!$jokersFound[$jokerNum]) {
-                        $jokerDelay[$jokerNum] = $drawIndex;
-                        $jokersFound[$jokerNum] = true;
-                    }
+            $jokerNum = $draw['joker'];
+            if ($jokerNum >= 1 && $jokerNum <= 20) {
+                if (!$jokersFound[$jokerNum]) {
+                    $jokerDelay[$jokerNum] = $drawIndex;
+                    $jokersFound[$jokerNum] = true;
+
                 }
             }
         }
 
         $jokers = [];
+        $medians = [];
+        $numbers_freq = [];
+        $even_odd_freq = [];
+        $totalDraws = count($draws);
+
         foreach ($draws as $draw) {
             $numbers = $draw['numbers']; // Ήδη ταξινομημένα
             $joker = $draw['joker'];
@@ -110,8 +108,8 @@ class JokerService
 
         return [
             'top_medians' => array_slice($medians, 0, 10, true),
-            'top_jokers' => array_slice($jokers, 0, 10, true),
-            'top_numbers' => array_slice($numbers_freq, 0, 10, true),
+            'top_jokers' => $jokers,
+            'top_numbers' => $numbers_freq,
             'even_odd_stats' => $even_odd_freq,
             'number_delay' => $numberDelay,
             'joker_delay' => $jokerDelay,
@@ -309,7 +307,7 @@ class JokerService
                         $delays[] = [
                             'date' => Carbon::createFromFormat('d/m/Y', $row[1]),
                             'numbers' => $numbers,
-                            'jokers' => $joker
+                            'joker' => $joker
                         ];
                     }
 
