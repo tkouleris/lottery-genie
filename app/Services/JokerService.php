@@ -22,6 +22,7 @@ class JokerService
     public function getStats(string $folder = 'stats/joker'): array
     {
         $draws = Cache::get('joker_stats');
+        $delays = Cache::get('joker_delays');
         if(is_null($draws)) {
             $output = $this->load_files($folder);
             $draws = $output['stats'];
@@ -66,7 +67,7 @@ class JokerService
         }
 
         $jokers = [];
-        $medians = [];
+//        $medians = [];
         $numbers_freq = [];
         $even_odd_freq = [];
         $totalDraws = count($draws);
@@ -76,8 +77,8 @@ class JokerService
             $joker = $draw['joker'];
 
             // 1. Διάμεσος (ο 3ος αριθμός στην πεντάδα)
-            $median = $numbers[2];
-            $medians[$median] = ($medians[$median] ?? 0) + 1;
+//            $median = $numbers[2];
+//            $medians[$median] = ($medians[$median] ?? 0) + 1;
 
             // 2. Τζόκερ
             $jokers[$joker] = ($jokers[$joker] ?? 0) + 1;
@@ -101,13 +102,13 @@ class JokerService
             $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
         }
 
-        arsort($medians);
+//        arsort($medians);
         arsort($jokers);
         arsort($numbers_freq);
         arsort($even_odd_freq);
 
         return [
-            'top_medians' => array_slice($medians, 0, 10, true),
+//            'top_medians' => array_slice($medians, 0, 10, true),
             'top_jokers' => $jokers,
             'top_numbers' => $numbers_freq,
             'even_odd_stats' => $even_odd_freq,

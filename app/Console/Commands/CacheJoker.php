@@ -43,6 +43,10 @@ class CacheJoker extends Command
         $stats = $output['stats'];
         Cache::put('joker_stats', $stats, now()->addDays(7));
 
+        Cache::forget('joker_delays');
+        $delays = $output['delays'];
+        Cache::put('joker_delays', $delays, now()->addDays(7));
+
         Cache::forget('joker_latest_draw_date');
         $latest_draw = $obj->getLatestDrawDate();
         Cache::put('joker_latest_draw_date', $latest_draw, now()->addDays(7));
