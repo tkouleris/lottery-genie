@@ -318,7 +318,6 @@ class EurojackpotService
         $lastDraw = [];
         $history = [];
         $delays = [];
-//        rsort($files);
 
         foreach ($files as $file) {
 
@@ -326,8 +325,6 @@ class EurojackpotService
                 $spreadsheet = IOFactory::load($file);
                 $worksheet = $spreadsheet->getActiveSheet();
                 $rows = $worksheet->toArray();
-//                $rows = array_slice($rows, 3);
-//                rsort($rows);
 
                 foreach ($rows as $index => $row) {
 
@@ -335,7 +332,7 @@ class EurojackpotService
                     if ($index < 3 ) {
                         continue;
                     }
-//                    dd($row);
+
                     // The numbers start 2 columns after the date (which is at index 1)
                     // So numbers are at indices 2, 3, 4, 5, 6
                     // Eurozahlen are at indices 7, 8
