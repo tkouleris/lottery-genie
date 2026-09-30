@@ -175,9 +175,7 @@ class EurojackpotService
 
         $jokerPairsFrequency = [];
         $even_odd_freq = [];
-        $last_date = null;
         foreach ($delays as $drawIndex => $draw) {
-            $last_date = $draw['date'];
 
             $numbers = $draw['numbers'];
             for ($i = 0; $i < 5; $i++) {
@@ -201,7 +199,7 @@ class EurojackpotService
                 }
             }
         }
-//        dd($last_date, $jokers, $numbers);
+
         foreach ($allDraws as $drawIndex => $draw) {
             $evenCount = 0;
             $oddCount = 0;

@@ -24,22 +24,52 @@ class JokerService
         if(is_null($draws)) {
             $output = $this->load_files($folder);
             $draws = $output['stats'];
+            $delays = $output['delays'];
         }
 
         if (empty($draws)) {
             throw new Exception("No data found in " . storage_path($folder));
         }
 
-        return $this->calculateStatistics($draws, $folder);
+        return $this->calculateStatistics($draws, $delays, $folder);
     }
 
-    private function calculateStatistics(array $draws, string $folder): array
+    private function calculateStatistics(array $draws, array $delays, string $folder): array
     {
         $medians = [];
         $jokers = [];
         $numbers_freq = [];
         $even_odd_freq = [];
         $totalDraws = count($draws);
+        $numberDelay = array_fill(1, 50, 0);
+        $jokerDelay = array_fill(1, 12, 0);
+        $numbersFound = array_fill(1, 50, false);
+        $jokersFound = array_fill(1, 12, false);
+
+        foreach ($delays as $drawIndex => $draw) {
+
+            $numbers = $draw['numbers'];
+            for ($i = 0; $i < 5; $i++) {
+                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 50) {
+                    $num = $numbers[$i];
+
+                    if (!$numbersFound[$num]) {
+                        $numberDelay[$num] = $drawIndex;
+                        $numbersFound[$num] = true;
+                    }
+                }
+            }
+            $jokers = $draw['jokers'];
+            for ($i = 0; $i <= 1; $i++) {
+                if (isset($jokers[$i]) && $jokers[$i] >= 1 && $jokers[$i] <= 12) {
+                    $jokerNum = $jokers[$i];
+                    if (!$jokersFound[$jokerNum]) {
+                        $jokerDelay[$jokerNum] = $drawIndex;
+                        $jokersFound[$jokerNum] = true;
+                    }
+                }
+            }
+        }
 
         foreach ($draws as $draw) {
             $numbers = $draw['numbers']; // Ήδη ταξινομημένα
@@ -81,6 +111,8 @@ class JokerService
             'top_jokers' => array_slice($jokers, 0, 10, true),
             'top_numbers' => array_slice($numbers_freq, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
+            'number_delay' => $numberDelay,
+            'joker_delay' => $jokerDelay,
             'total_draws_analyzed' => $totalDraws,
             'latest_draw_date' => File::get_latest_file_date($folder),
         ];
@@ -235,6 +267,7 @@ class JokerService
         $finalStatistics = [];
         $stats = [];
         $lastDraw = [];
+        $delays = [];
         foreach ($files as $file) {
             try {
                 $spreadsheet = IOFactory::load($file);
@@ -270,6 +303,12 @@ class JokerService
                             'numbers' => $numbers,
                             'joker' => $joker
                         ];
+
+                        $delays[] = [
+                            'date' => Carbon::createFromFormat('d/m/Y', $row[1]),
+                            'numbers' => $numbers,
+                            'jokers' => $joker
+                        ];
                     }
 
                     if(count($lastDraw) ==0) {
@@ -285,7 +324,10 @@ class JokerService
                 Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
-        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw];
+        $delays = collect($delays)
+            ->sortByDesc(fn ($delay) => Carbon::parse($delay['date']))
+            ->values();
+        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
     }
 
     public function checkCombination(array $userNumbers, array $userJokers): array
