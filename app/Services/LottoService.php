@@ -49,7 +49,7 @@ class LottoService
         foreach ($delays as $drawIndex => $draw) {
             $numbers = $draw['numbers'];
             for ($i = 0; $i < 6; $i++) {
-                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 45) {
+                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 49) {
                     $num = $numbers[$i];
 
                     if (!$numbersFound[$num]) {
