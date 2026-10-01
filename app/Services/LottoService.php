@@ -6,6 +6,7 @@ use App\Helpers\File;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -21,25 +22,44 @@ class LottoService
     public function getStats(string $folder = 'stats/lotto'): array
     {
         $draws = Cache::get('lotto_stats');
+        $delays = Cache::get('lotto_delays');
         if(is_null($draws)) {
             $output = $this->load_files($folder);
             $draws = $output['stats'];
+            $delays = $output['delays'];
         }
 
         if (empty($draws)) {
             throw new Exception("No data found in " . storage_path($folder));
         }
 
-        return $this->calculateStatistics($draws, $folder);
+        return $this->calculateStatistics($draws, $delays, $folder);
     }
 
-    private function calculateStatistics(array $draws, string $folder): array
+    private function calculateStatistics(array $draws, Collection $delays, string $folder): array
     {
         $numbers_freq = [];
         $differences_freq = [];
         $triples_freq = [];
         $even_odd_freq = [];
         $totalDraws = count($draws);
+
+        $numbersFound = array_fill(1, 45, false);
+        $numberDelay = array_fill(1, 45, 0);
+        foreach ($delays as $drawIndex => $draw) {
+            $numbers = $draw['numbers'];
+            for ($i = 0; $i < 6; $i++) {
+                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 45) {
+                    $num = $numbers[$i];
+
+                    if (!$numbersFound[$num]) {
+                        $numberDelay[$num] = $drawIndex;
+                        $numbersFound[$num] = true;
+                    }
+                }
+            }
+
+        }
 
         foreach ($draws as $draw) {
             $numbers = $draw['numbers']; // Ήδη ταξινομημένα
@@ -91,6 +111,7 @@ class LottoService
             'top_triples' => array_slice($triples_freq, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
             'total_draws_analyzed' => $totalDraws,
+            'number_delay' => $numberDelay,
             'latest_draw_date' => File::get_latest_file_date($folder),
         ];
     }
@@ -232,6 +253,7 @@ class LottoService
         $finalStatistics = [];
         $stats = [];
         $lastDraw = [];
+        $delays = [];
         foreach ($files as $file) {
             try {
                 $spreadsheet = IOFactory::load($file);
@@ -261,6 +283,11 @@ class LottoService
                             'date' => $row[1],
                             'numbers' => $numbers
                         ];
+
+                        $delays[] = [
+                            'date' => Carbon::createFromFormat('d/m/Y', $row[1]),
+                            'numbers' => $numbers
+                        ];
                     }
 
                     if(count($lastDraw) == 0) {
@@ -277,7 +304,10 @@ class LottoService
                 Log::error("Error reading file {$file}: " . $e->getMessage());
             }
         }
-        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw];
+        $delays = collect($delays)
+            ->sortByDesc(fn ($delay) => Carbon::parse($delay['date']))
+            ->values();
+        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
     }
 
     public function checkCombination(array $userNumbers): array

@@ -44,6 +44,10 @@ class CacheLotto extends Command
         $draws = $output['stats'];
         Cache::put('lotto_stats', $draws, now()->addDays(7));
 
+        Cache::forget('lotto_delays');
+        $delays = $output['delays'];
+        Cache::put('lotto_delays', $delays, now()->addDays(7));
+
         Cache::forget('lotto_latest_draw_date');
         $obj = resolve(LottoService::class);
         $latest_draw = $obj->getLatestDrawDate();
