@@ -44,8 +44,8 @@ class LottoService
         $even_odd_freq = [];
         $totalDraws = count($draws);
 
-        $numbersFound = array_fill(1, 45, false);
-        $numberDelay = array_fill(1, 45, 0);
+        $numbersFound = array_fill(1, 49, false);
+        $numberDelay = array_fill(1, 49, 0);
         foreach ($delays as $drawIndex => $draw) {
             $numbers = $draw['numbers'];
             for ($i = 0; $i < 6; $i++) {

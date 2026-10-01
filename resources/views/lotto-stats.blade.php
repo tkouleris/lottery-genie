@@ -32,7 +32,7 @@
         <section class="card-glass rounded-3xl p-8">
             <h2 class="text-2xl font-bold mb-6 text-red-400">Numbers in Delay</h2>
             <div class="mb-8">
-                <h3 class="text-xl font-bold mb-4 text-blue-300">Main Numbers (1-45)</h3>
+                <h3 class="text-xl font-bold mb-4 text-blue-300">Main Numbers (1-49)</h3>
                 <div class="grid grid-cols-5 md:grid-cols-10 gap-4">
                     @php asort($stats['number_delay']); @endphp
                     @foreach($stats['number_delay'] as $num => $delay)
