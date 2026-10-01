@@ -49,6 +49,10 @@ class CacheEurojackpot extends Command
         $history = $output['history'];
         Cache::put('eurojackpot_history', $history, now()->addDays(7));
 
+        Cache::forget('eurojackpot_delays');
+        $delays = $output['delays'];
+        Cache::put('eurojackpot_delays', $delays, now()->addDays(7));
+
 
         Cache::forget('eurojackpot_latest_draw_date');
         $obj = resolve(EurojackpotService::class);

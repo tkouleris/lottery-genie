@@ -151,7 +151,7 @@ class EurojackpotService
     public function get_stats(string $folder = 'stats/euro'): array
     {
         $allDraws = Cache::get('eurojackpot_stats');
-        $delays = null;
+        $delays = Cache::get('eurojackpot_delays');
         if (is_null($allDraws)) {
             $output = $this->load_files();
             $allDraws = $output['stats'];
