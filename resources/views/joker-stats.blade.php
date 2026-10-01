@@ -30,7 +30,8 @@
 
         <!-- Simple Number Frequency -->
         <section class="card-glass rounded-3xl p-8">
-            <h2 class="text-2xl font-bold mb-6 text-green-400">10 Most Frequent Simple Numbers</h2>
+            <h2 class="text-2xl font-bold mb-2 text-green-400">10 Most Frequent Simple Numbers</h2>
+            <p class="text-slate-400 text-sm mb-6">The main numbers (1-45) that appear most often in the draw history.</p>
             <div class="grid grid-cols-5 md:grid-cols-10 gap-4">
                 @foreach($stats['top_numbers'] as $num => $count)
                     <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
@@ -45,7 +46,8 @@
 
         <!-- Delays -->
         <section class="card-glass rounded-3xl p-8">
-            <h2 class="text-2xl font-bold mb-6 text-red-400">Numbers in Delay</h2>
+            <h2 class="text-2xl font-bold mb-2 text-red-400">Numbers in Delay</h2>
+            <p class="text-slate-400 text-sm mb-6">Number of draws since each number was last drawn (Current Delay).</p>
             <div class="mb-8">
                 <h3 class="text-xl font-bold mb-4 text-blue-300">Main Numbers (1-45)</h3>
                 <div class="grid grid-cols-5 md:grid-cols-10 gap-4">
@@ -79,7 +81,8 @@
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Joker Frequency -->
             <section class="card-glass rounded-3xl p-8">
-                <h2 class="text-2xl font-bold mb-6 text-yellow-400">10 Most Frequent Jokers</h2>
+                <h2 class="text-2xl font-bold mb-2 text-yellow-400">10 Most Frequent Jokers</h2>
+                <p class="text-slate-400 text-sm mb-6">The Joker numbers (1-20) that appear most often in the draw history.</p>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     @foreach($stats['top_jokers'] as $num => $count)
                         <div class="flex flex-col items-center p-2 rounded-xl bg-slate-800/50">
@@ -94,7 +97,8 @@
 
             <!-- Even / Odd Frequency -->
             <section class="card-glass rounded-3xl p-8">
-                <h2 class="text-2xl font-bold mb-6 text-yellow-400">Even / Odd Combinations</h2>
+                <h2 class="text-2xl font-bold mb-2 text-yellow-400">Even / Odd Combinations</h2>
+                <p class="text-slate-400 text-sm mb-6">Frequency of even and odd number counts in the same draw.</p>
                 <div class="space-y-4">
                     @foreach($stats['even_odd_stats'] as $combo => $count)
                         <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/50">
