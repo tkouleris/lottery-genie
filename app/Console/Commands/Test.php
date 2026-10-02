@@ -27,9 +27,6 @@ class Test extends Command
      */
     public function handle()
     {
-//        Cache::forget('joker_latest_draw_date');
-        $obj = resolve(JokerService::class);
-        $output = $obj->getLatestDrawDate();
-        dd($output);
+
     }
 }

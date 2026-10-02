@@ -25,7 +25,7 @@ class CacheEurojackpot extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Load Eurojackpot draw files and cache their stats, history, number delays and latest draw date';
 
     /**
      * Execute the console command.
