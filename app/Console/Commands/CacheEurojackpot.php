@@ -2,14 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Helpers\File;
 use App\Services\EurojackpotService;
-use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CacheEurojackpot extends Command
 {

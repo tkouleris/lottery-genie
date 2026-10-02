@@ -2,14 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Helpers\File;
-use App\Services\EurojackpotService;
 use App\Services\LottoService;
-use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CacheLotto extends Command
 {
@@ -25,7 +20,7 @@ class CacheLotto extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Load Lotto draw files and cache their draws, stats, number delays and latest draw date';
 
     /**
      * Execute the console command.
