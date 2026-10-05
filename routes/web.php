@@ -21,6 +21,7 @@ Route::get('/', [MainController::class, 'index']);
 Route::get('/eurojackpot', [DrawsController::class, 'draw_eurojackpot'])->name('eurojackpot');
 Route::get('/eurojackpot/stats', [DrawsController::class, 'eurojackpot_stats'])->name('eurojackpot.stats');
 Route::get('/eurojackpot/checker', [DrawsController::class, 'eurojackpot_checker'])->name('eurojackpot.checker');
+Route::get('/eurojackpot/sum-checker', [DrawsController::class, 'eurojackpot_sum_checker'])->name('eurojackpot.sum-checker');
 Route::get('/joker', [DrawsController::class, 'draw_joker'])->name('joker');
 Route::get('/joker/stats', [DrawsController::class, 'joker_stats'])->name('joker.stats');
 Route::get('/joker/checker', [DrawsController::class, 'joker_checker'])->name('joker.checker');

@@ -48,6 +48,7 @@
                         <a href="{{ route('eurojackpot') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Predict</a>
                         <a href="{{ route('eurojackpot.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Stats</a>
                         <a href="{{ route('eurojackpot.checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Checker</a>
+                        <a href="{{ route('eurojackpot.sum-checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Sum Checker</a>
                     </div>
                 </div>
                 <div class="relative" x-data="{ open: false }">

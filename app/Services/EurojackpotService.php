@@ -264,7 +264,7 @@ class EurojackpotService
             'joker_delay' => $jokerDelay,
             'common_joker_combinations' => array_slice($jokerPairsFrequency, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
-            'sum_distribution' => $this->getSumDistribution($delays),
+            'sum_distribution' => $this->calculateSumDistribution($delays),
             'total_draws_analyzed' => count($allDraws),
             'latest_draw_date' => File::get_latest_file_date($folder),
         ];
@@ -440,12 +440,27 @@ class EurojackpotService
     }
 
     /**
+     * @param string $folder
+     * @return array
+     * @throws FileNotFoundException
+     */
+    public function getSumDistribution(string $folder = 'stats/euro'): array
+    {
+        $delays = Cache::get('eurojackpot_delays');
+        if (is_null($delays)) {
+            $delays = $this->load_files($folder)['delays'];
+        }
+
+        return $this->calculateSumDistribution($delays);
+    }
+
+    /**
      * Sum distribution of the 5 main numbers across all draws.
      * Possible sums range from 15 (1+2+3+4+5) to 240 (46+47+48+49+50), theoretical mean 127.5.
      * @param iterable $draws draws with 'date' (Carbon) and 'numbers' keys
      * @return array
      */
-    private function getSumDistribution(iterable $draws): array
+    private function calculateSumDistribution(iterable $draws): array
     {
         $optimalRange = ['min' => 100, 'max' => 155];
         $moderateRange = ['min' => 80, 'max' => 175];

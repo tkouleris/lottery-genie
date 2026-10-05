@@ -88,6 +88,12 @@ class DrawsController extends Controller
         return view('eurojackpot-checker', compact('results', 'userNumbers', 'userJokers'));
     }
 
+    public function eurojackpot_sum_checker(EurojackpotService $eurojackpotService)
+    {
+        $sumStats = $eurojackpotService->getSumDistribution();
+        return view('eurojackpot-sum-checker', compact('sumStats'));
+    }
+
     public function joker_checker(Request $request, JokerService $jokerService)
     {
         $results = null;
