@@ -110,6 +110,7 @@ class LottoService
             'top_differences' => array_slice($differences_freq, 0, 10, true),
             'top_triples' => array_slice($triples_freq, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
+            'sum_distribution' => $this->sumDistribution()->calculate($delays),
             'total_draws_analyzed' => $totalDraws,
             'number_delay' => $numberDelay,
             'latest_draw_date' => File::get_latest_file_date($folder),

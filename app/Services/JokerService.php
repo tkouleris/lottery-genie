@@ -112,6 +112,7 @@ class JokerService
             'top_jokers' => $jokers,
             'top_numbers' => $numbers_freq,
             'even_odd_stats' => $even_odd_freq,
+            'sum_distribution' => $this->sumDistribution()->calculate($delays),
             'number_delay' => $numberDelay,
             'joker_delay' => $jokerDelay,
             'total_draws_analyzed' => $totalDraws,

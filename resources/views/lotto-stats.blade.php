@@ -98,6 +98,9 @@
                 @endforeach
             </div>
         </section>
+
+        <!-- Main Numbers Sum Range Distribution -->
+        @include('partials.sum_distribution', ['sumStats' => $stats['sum_distribution'], 'sumCheckerRoute' => 'lotto.sum-checker'])
     </div>
 
     <div class="mt-8 text-center">
