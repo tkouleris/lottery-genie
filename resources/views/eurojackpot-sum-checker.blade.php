@@ -14,6 +14,7 @@
                  'optimal' => $sumStats['optimal_range'],
                  'moderate' => $sumStats['moderate_range'],
                  'buckets' => $sumStats['buckets'],
+                 'numbers' => $initialNumbers,
              ]) }})">
         <h2 class="text-2xl font-bold mb-2 text-purple-400">Check Ticket Sum</h2>
         <p class="text-slate-400 text-sm mb-4">Enter 5 main numbers (1-50) to see how their sum compares with the historical draws.</p>
@@ -55,7 +56,7 @@
     <script>
         function sumCalculator(config) {
             return {
-                numbers: ['', '', '', '', ''],
+                numbers: config.numbers,
                 values() {
                     return this.numbers.filter(n => n !== '' && n !== null).map(n => parseInt(n, 10));
                 },

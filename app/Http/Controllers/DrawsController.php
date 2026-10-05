@@ -88,10 +88,20 @@ class DrawsController extends Controller
         return view('eurojackpot-checker', compact('results', 'userNumbers', 'userJokers'));
     }
 
-    public function eurojackpot_sum_checker(EurojackpotService $eurojackpotService)
+    public function eurojackpot_sum_checker(Request $request, EurojackpotService $eurojackpotService)
     {
         $sumStats = $eurojackpotService->getSumDistribution();
-        return view('eurojackpot-sum-checker', compact('sumStats'));
+
+        // Pre-fill the calculator from ?numbers[]=..., ignoring anything that is not a main number (1-50)
+        $initialNumbers = array_fill(0, 5, '');
+        $requested = array_slice(array_values((array)$request->input('numbers', [])), 0, 5);
+        foreach ($requested as $i => $number) {
+            if (filter_var($number, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 50]]) !== false) {
+                $initialNumbers[$i] = (int)$number;
+            }
+        }
+
+        return view('eurojackpot-sum-checker', compact('sumStats', 'initialNumbers'));
     }
 
     public function joker_checker(Request $request, JokerService $jokerService)
