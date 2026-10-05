@@ -264,6 +264,7 @@ class EurojackpotService
             'joker_delay' => $jokerDelay,
             'common_joker_combinations' => array_slice($jokerPairsFrequency, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
+            'sum_distribution' => $this->getSumDistribution($delays),
             'total_draws_analyzed' => count($allDraws),
             'latest_draw_date' => File::get_latest_file_date($folder),
         ];
@@ -436,6 +437,98 @@ class EurojackpotService
         }
 
         return $results;
+    }
+
+    /**
+     * Sum distribution of the 5 main numbers across all draws.
+     * Possible sums range from 15 (1+2+3+4+5) to 240 (46+47+48+49+50), theoretical mean 127.5.
+     * @param iterable $draws draws with 'date' (Carbon) and 'numbers' keys
+     * @return array
+     */
+    private function getSumDistribution(iterable $draws): array
+    {
+        $optimalRange = ['min' => 100, 'max' => 155];
+        $moderateRange = ['min' => 80, 'max' => 175];
+
+        $buckets = [
+            ['label' => '< 80', 'name' => 'Very Low', 'min' => 15, 'max' => 79],
+            ['label' => '80 – 99', 'name' => 'Low', 'min' => 80, 'max' => 99],
+            ['label' => '100 – 119', 'name' => 'Mid-Low', 'min' => 100, 'max' => 119],
+            ['label' => '120 – 139', 'name' => 'Core Average', 'min' => 120, 'max' => 139],
+            ['label' => '140 – 159', 'name' => 'Mid-High', 'min' => 140, 'max' => 159],
+            ['label' => '160 – 179', 'name' => 'High', 'min' => 160, 'max' => 179],
+            ['label' => '>= 180', 'name' => 'Very High', 'min' => 180, 'max' => 240],
+        ];
+        foreach ($buckets as &$bucket) {
+            $bucket['count'] = 0;
+        }
+        unset($bucket);
+
+        $total = 0;
+        $sumTotal = 0;
+        $inOptimal = 0;
+        $lowest = null;
+        $highest = null;
+
+        foreach ($draws as $draw) {
+            if (count($draw['numbers']) !== 5) {
+                continue;
+            }
+            $sum = array_sum($draw['numbers']);
+            $total++;
+            $sumTotal += $sum;
+
+            foreach ($buckets as &$bucket) {
+                if ($sum >= $bucket['min'] && $sum <= $bucket['max']) {
+                    $bucket['count']++;
+                    break;
+                }
+            }
+            unset($bucket);
+
+            if ($sum >= $optimalRange['min'] && $sum <= $optimalRange['max']) {
+                $inOptimal++;
+            }
+
+            $numbers = $draw['numbers'];
+            sort($numbers);
+            $entry = [
+                'sum' => $sum,
+                'date' => Carbon::parse($draw['date'])->format('d/m/Y'),
+                'numbers' => $numbers,
+            ];
+            if (is_null($lowest) || $sum < $lowest['sum']) {
+                $lowest = $entry;
+            }
+            if (is_null($highest) || $sum > $highest['sum']) {
+                $highest = $entry;
+            }
+        }
+
+        $maxCount = 0;
+        $mostFrequentIndex = null;
+        foreach ($buckets as $index => &$bucket) {
+            $bucket['percentage'] = $total > 0 ? round($bucket['count'] / $total * 100, 1) : 0;
+            if ($bucket['count'] > $maxCount) {
+                $maxCount = $bucket['count'];
+                $mostFrequentIndex = $index;
+            }
+        }
+        unset($bucket);
+
+        return [
+            'buckets' => $buckets,
+            'most_frequent_index' => $mostFrequentIndex,
+            'max_count' => $maxCount,
+            'average' => $total > 0 ? round($sumTotal / $total, 2) : 0,
+            'theoretical_mean' => 127.5,
+            'lowest' => $lowest,
+            'highest' => $highest,
+            'optimal_range' => $optimalRange,
+            'moderate_range' => $moderateRange,
+            'optimal_percentage' => $total > 0 ? round($inOptimal / $total * 100, 1) : 0,
+            'total' => $total,
+        ];
     }
 
     private function getNextDrawDate()
