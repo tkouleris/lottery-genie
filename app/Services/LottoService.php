@@ -23,7 +23,7 @@ class LottoService
     {
         $draws = Cache::get('lotto_stats');
         $delays = Cache::get('lotto_delays');
-        if(is_null($draws)) {
+        if (is_null($draws)) {
             $output = $this->load_files($folder);
             $draws = $output['stats'];
             $delays = $output['delays'];
@@ -106,7 +106,7 @@ class LottoService
         arsort($even_odd_freq);
 
         return [
-            'top_numbers' => array_slice($numbers_freq, 0, 10, true),
+            'top_numbers' => $numbers_freq,
             'top_differences' => array_slice($differences_freq, 0, 10, true),
             'top_triples' => array_slice($triples_freq, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
@@ -151,7 +151,7 @@ class LottoService
     public function run($folder = 'stats/lotto'): array
     {
         $finalStatistics = Cache::get('lotto_draws');
-        if(is_null($finalStatistics)) {
+        if (is_null($finalStatistics)) {
             $output = $this->load_files($folder);
             $finalStatistics = $output['draws'];
         }
@@ -223,12 +223,12 @@ class LottoService
     public function getLatestDrawDate(string $folder = 'stats/lotto'): array
     {
         $out = Cache::get('lotto_latest_draw_date');
-        if($out) {
+        if ($out) {
             return $out;
         }
         $lastDraw = $this->load_files($folder)['lastDraw'];
 
-        if(count($lastDraw) ==0) {
+        if (count($lastDraw) == 0) {
             return [];
         }
 
@@ -263,14 +263,14 @@ class LottoService
 
                 foreach ($rows as $index => $row) {
                     // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 4 ) {
+                    if ($index < 4) {
                         continue;
                     }
 
                     $drawData = [];
                     for ($i = 2; $i <= 7; $i++) {
                         if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                            $drawData[] = (int) $row[$i];
                         }
                     }
                     if (count($drawData) >= 6) {
@@ -291,13 +291,13 @@ class LottoService
                         ];
                     }
 
-                    if(count($lastDraw) == 0) {
+                    if (count($lastDraw) == 0) {
                         $lastDraw = $row;
                     }
 
                     $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
                     $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
-                    if($previous_date->lt($current_date)) {
+                    if ($previous_date->lt($current_date)) {
                         $lastDraw = $row;
                     }
                 }
@@ -306,7 +306,7 @@ class LottoService
             }
         }
         $delays = collect($delays)
-            ->sortByDesc(fn ($delay) => Carbon::parse($delay['date']))
+            ->sortByDesc(fn($delay) => Carbon::parse($delay['date']))
             ->values();
         return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
     }
@@ -314,7 +314,7 @@ class LottoService
     public function checkCombination(array $userNumbers): array
     {
         $history = Cache::get('lotto_stats');
-        if(is_null($history)) {
+        if (is_null($history)) {
             $output = $this->load_files();
             $history = $output['stats'];
         }
@@ -342,7 +342,7 @@ class LottoService
 
             // Lotto tiers: 6, 5, 4, 3
             if ($numCount >= 3) {
-                $tier = (string)$numCount;
+                $tier = (string) $numCount;
                 $results['breakdown'][$tier] = ($results['breakdown'][$tier] ?? 0) + 1;
 
                 $results['match_history'][] = [
@@ -392,7 +392,7 @@ class LottoService
         return collect([
             Carbon::SATURDAY,
             Carbon::WEDNESDAY,
-        ])->map(fn ($day) => $now->copy()->next($day))
+        ])->map(fn($day) => $now->copy()->next($day))
             ->sort()
             ->first()
             ->format('d/m/Y');
