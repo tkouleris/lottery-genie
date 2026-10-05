@@ -25,9 +25,11 @@ Route::get('/eurojackpot/sum-checker', [DrawsController::class, 'eurojackpot_sum
 Route::get('/joker', [DrawsController::class, 'draw_joker'])->name('joker');
 Route::get('/joker/stats', [DrawsController::class, 'joker_stats'])->name('joker.stats');
 Route::get('/joker/checker', [DrawsController::class, 'joker_checker'])->name('joker.checker');
+Route::get('/joker/sum-checker', [DrawsController::class, 'joker_sum_checker'])->name('joker.sum-checker');
 Route::get('/lotto', [DrawsController::class, 'draw_lotto'])->name('lotto');
 Route::get('/lotto/stats', [DrawsController::class, 'lotto_stats'])->name('lotto.stats');
 Route::get('/lotto/checker', [DrawsController::class, 'lotto_checker'])->name('lotto.checker');
+Route::get('/lotto/sum-checker', [DrawsController::class, 'lotto_sum_checker'])->name('lotto.sum-checker');
 Route::get('/about', function () {
     return view('about');
 })->name('about');

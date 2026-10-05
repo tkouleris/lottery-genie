@@ -90,18 +90,44 @@ class DrawsController extends Controller
 
     public function eurojackpot_sum_checker(Request $request, EurojackpotService $eurojackpotService)
     {
-        $sumStats = $eurojackpotService->getSumDistribution();
+        return $this->sumChecker($request, $eurojackpotService->getSumDistribution(), [
+            'name' => 'Eurojackpot',
+            'logo' => 'img/eurojackpot.jpg',
+            'stats_route' => 'eurojackpot.stats',
+        ]);
+    }
 
-        // Pre-fill the calculator from ?numbers[]=..., ignoring anything that is not a main number (1-50)
-        $initialNumbers = array_fill(0, 5, '');
-        $requested = array_slice(array_values((array)$request->input('numbers', [])), 0, 5);
+    public function joker_sum_checker(Request $request, JokerService $jokerService)
+    {
+        return $this->sumChecker($request, $jokerService->getSumDistribution(), [
+            'name' => 'Joker',
+            'logo' => 'img/tzoker.jpg',
+            'stats_route' => 'joker.stats',
+        ]);
+    }
+
+    public function lotto_sum_checker(Request $request, LottoService $lottoService)
+    {
+        return $this->sumChecker($request, $lottoService->getSumDistribution(), [
+            'name' => 'Lotto',
+            'logo' => 'img/lotto.jpg',
+            'stats_route' => 'lotto.stats',
+        ]);
+    }
+
+    private function sumChecker(Request $request, array $sumStats, array $game)
+    {
+        // Pre-fill the calculator from ?numbers[]=..., ignoring anything that is not a valid main number
+        $initialNumbers = array_fill(0, $sumStats['pick'], '');
+        $requested = array_slice(array_values((array)$request->input('numbers', [])), 0, $sumStats['pick']);
         foreach ($requested as $i => $number) {
-            if (filter_var($number, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 50]]) !== false) {
+            $options = ['options' => ['min_range' => 1, 'max_range' => $sumStats['max_number']]];
+            if (filter_var($number, FILTER_VALIDATE_INT, $options) !== false) {
                 $initialNumbers[$i] = (int)$number;
             }
         }
 
-        return view('eurojackpot-sum-checker', compact('sumStats', 'initialNumbers'));
+        return view('sum-checker', compact('sumStats', 'initialNumbers', 'game'));
     }
 
     public function joker_checker(Request $request, JokerService $jokerService)

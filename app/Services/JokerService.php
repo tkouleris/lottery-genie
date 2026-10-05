@@ -387,6 +387,35 @@ class JokerService
         return $results;
     }
 
+    /**
+     * @param string $folder
+     * @return array
+     * @throws FileNotFoundException
+     */
+    public function getSumDistribution(string $folder = 'stats/joker'): array
+    {
+        $delays = Cache::get('joker_delays');
+        if (is_null($delays)) {
+            $delays = $this->load_files($folder)['delays'];
+        }
+
+        return $this->sumDistribution()->calculate($delays);
+    }
+
+    /**
+     * 5 of 45: possible sums 15 – 215, theoretical mean 115
+     */
+    private function sumDistribution(): SumDistribution
+    {
+        return new SumDistribution(
+            pick: 5,
+            maxNumber: 45,
+            bucketEdges: [65, 85, 105, 125, 145, 165],
+            optimalRange: ['min' => 90, 'max' => 140],
+            moderateRange: ['min' => 70, 'max' => 160],
+        );
+    }
+
     private function getNextDrawDate()
     {
         $now = Carbon::now()->subDays(1);

@@ -356,6 +356,35 @@ class LottoService
         return $results;
     }
 
+    /**
+     * @param string $folder
+     * @return array
+     * @throws FileNotFoundException
+     */
+    public function getSumDistribution(string $folder = 'stats/lotto'): array
+    {
+        $delays = Cache::get('lotto_delays');
+        if (is_null($delays)) {
+            $delays = $this->load_files($folder)['delays'];
+        }
+
+        return $this->sumDistribution()->calculate($delays);
+    }
+
+    /**
+     * 6 of 49: possible sums 21 – 279, theoretical mean 150
+     */
+    private function sumDistribution(): SumDistribution
+    {
+        return new SumDistribution(
+            pick: 6,
+            maxNumber: 49,
+            bucketEdges: [100, 120, 140, 160, 180, 200],
+            optimalRange: ['min' => 120, 'max' => 180],
+            moderateRange: ['min' => 100, 'max' => 200],
+        );
+    }
+
     private function getNextDrawDate()
     {
         $now = Carbon::now()->subDays(1);

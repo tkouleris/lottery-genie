@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Eurojackpot Sum Checker')
+@section('title', $game['name'] . ' Sum Checker')
 
 @section('content')
     <header class="text-center mb-12">
-        <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto" style="max-height: 150px;">
-        <h1 class="text-3xl font-bold mt-4">Eurojackpot Sum Checker</h1>
+        <img src="{{ asset($game['logo']) }}" alt="{{ $game['name'] }} Logo" class="mx-auto" style="max-height: 150px;">
+        <h1 class="text-3xl font-bold mt-4">{{ $game['name'] }} Sum Checker</h1>
         <p class="text-slate-400 text-lg">Check how your main numbers' sum compares with {{ $sumStats['total'] }} historical draws</p>
     </header>
 
@@ -15,16 +15,17 @@
                  'moderate' => $sumStats['moderate_range'],
                  'buckets' => $sumStats['buckets'],
                  'numbers' => $initialNumbers,
+                 'maxNumber' => $sumStats['max_number'],
              ]) }})">
         <h2 class="text-2xl font-bold mb-2 text-purple-400">Check Ticket Sum</h2>
-        <p class="text-slate-400 text-sm mb-4">Enter 5 main numbers (1-50) to see how their sum compares with the historical draws.</p>
+        <p class="text-slate-400 text-sm mb-4">Enter {{ $sumStats['pick'] }} main numbers (1-{{ $sumStats['max_number'] }}) to see how their sum compares with the historical draws.</p>
         <div class="flex flex-wrap justify-center gap-3 mb-6">
             <template x-for="(n, i) in numbers" :key="i">
-                <input type="number" min="1" max="50" x-model="numbers[i]"
+                <input type="number" min="1" :max="maxNumber" x-model="numbers[i]"
                        class="w-16 h-16 text-center text-xl font-bold rounded-full bg-slate-900 border-2 border-slate-600 focus:border-purple-400 focus:outline-none text-white"
                        :class="{ 'border-red-500': isInvalid(i) }">
             </template>
-            <button type="button" @click="numbers = ['', '', '', '', '']"
+            <button type="button" @click="numbers = numbers.map(() => '')"
                     class="px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-sm text-slate-300 transition-colors">
                 Clear
             </button>
@@ -33,13 +34,13 @@
         <template x-if="error">
             <p class="text-center text-sm text-red-400" x-text="error"></p>
         </template>
-        <template x-if="!error && filled() < 5">
+        <template x-if="!error && filled() < numbers.length">
             <p class="text-center text-sm text-slate-400">
                 Running sum: <span class="font-bold text-slate-200" x-text="sum()"></span>
-                (<span x-text="filled()"></span>/5 numbers)
+                (<span x-text="filled()"></span>/<span x-text="numbers.length"></span> numbers)
             </p>
         </template>
-        <template x-if="!error && filled() === 5">
+        <template x-if="!error && filled() === numbers.length">
             <div class="flex flex-col md:flex-row items-center justify-center gap-4 p-4 rounded-xl border"
                  :class="status().box">
                 <span class="text-4xl font-bold" x-text="sum()"></span>
@@ -57,6 +58,7 @@
         function sumCalculator(config) {
             return {
                 numbers: config.numbers,
+                maxNumber: config.maxNumber,
                 values() {
                     return this.numbers.filter(n => n !== '' && n !== null).map(n => parseInt(n, 10));
                 },
@@ -70,12 +72,12 @@
                     const raw = this.numbers[i];
                     if (raw === '' || raw === null) return false;
                     const n = parseInt(raw, 10);
-                    return !Number.isInteger(n) || n < 1 || n > 50
+                    return !Number.isInteger(n) || n < 1 || n > this.maxNumber
                         || this.numbers.some((other, j) => j !== i && other !== '' && parseInt(other, 10) === n);
                 },
                 get error() {
                     const vals = this.values();
-                    if (vals.some(n => !Number.isInteger(n) || n < 1 || n > 50)) return 'Numbers must be between 1 and 50.';
+                    if (vals.some(n => !Number.isInteger(n) || n < 1 || n > this.maxNumber)) return `Numbers must be between 1 and ${this.maxNumber}.`;
                     if (new Set(vals).size !== vals.length) return 'Numbers must be unique.';
                     return null;
                 },
@@ -113,9 +115,9 @@
     </script>
 
     <div class="mt-8 text-center">
-        <a href="{{ route('eurojackpot.stats') }}"
+        <a href="{{ route($game['stats_route']) }}"
            class="inline-block px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold hover:from-blue-600 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25">
-            View Sum Distribution Stats
+            View Historical Statistics
         </a>
     </div>
 @endsection
