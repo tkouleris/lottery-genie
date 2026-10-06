@@ -14,6 +14,13 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class JokerService
 {
     /**
+     * Joker draws 5 main numbers of 45 and 1 joker number of 20
+     */
+    private const PICK = 5;
+    private const MAX_NUMBER = 45;
+    private const MAX_JOKER = 20;
+
+    /**
      * @param string $folder
      * @return array
      * @throws FileNotFoundException
@@ -23,7 +30,7 @@ class JokerService
     {
         $draws = Cache::get('joker_stats');
         $delays = Cache::get('joker_delays');
-        if(is_null($draws)) {
+        if (is_null($draws) || is_null($delays)) {
             $output = $this->load_files($folder);
             $draws = $output['stats'];
             $delays = $output['delays'];
@@ -39,213 +46,136 @@ class JokerService
     private function calculateStatistics(array $draws, Collection $delays, string $folder): array
     {
         $jokers = [];
-        $numberDelay = array_fill(1, 45, 0);
-        $jokerDelay = array_fill(1, 20, 0);
-        $numbersFound = array_fill(1, 45, false);
-        $jokersFound = array_fill(1, 20, false);
-
-        foreach ($delays as $drawIndex => $draw) {
-            $numbers = $draw['numbers'];
-            for ($i = 0; $i < 5; $i++) {
-                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 45) {
-                    $num = $numbers[$i];
-
-                    if (!$numbersFound[$num]) {
-                        $numberDelay[$num] = $drawIndex;
-                        $numbersFound[$num] = true;
-                    }
-                }
-            }
-            $jokerNum = $draw['joker'];
-            if ($jokerNum >= 1 && $jokerNum <= 20) {
-                if (!$jokersFound[$jokerNum]) {
-                    $jokerDelay[$jokerNum] = $drawIndex;
-                    $jokersFound[$jokerNum] = true;
-
-                }
-            }
-        }
-
-        $jokers = [];
-//        $medians = [];
         $numbers_freq = [];
         $even_odd_freq = [];
-        $totalDraws = count($draws);
 
         foreach ($draws as $draw) {
-            $numbers = $draw['numbers']; // Already sorted
+            $numbers = $draw['numbers'];
             $joker = $draw['joker'];
 
-            // 1. Median (the 3rd number of the five)
-//            $median = $numbers[2];
-//            $medians[$median] = ($medians[$median] ?? 0) + 1;
-
-            // 2. Joker
+            // 1. Joker
             $jokers[$joker] = ($jokers[$joker] ?? 0) + 1;
 
-            // 3. Main numbers
+            // 2. Main numbers
             foreach ($numbers as $num) {
                 $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
             }
 
-            // 4. Even / Odd frequency (for the 5 numbers)
-            $evenCount = 0;
-            $oddCount = 0;
-            foreach ($numbers as $num) {
-                if ($num % 2 === 0) {
-                    $evenCount++;
-                } else {
-                    $oddCount++;
-                }
-            }
+            // 3. Even / Odd frequency (for the 5 numbers)
+            $evenCount = count(array_filter($numbers, fn($num) => $num % 2 === 0));
+            $oddCount = count($numbers) - $evenCount;
             $evenOddKey = "{$evenCount} even / {$oddCount} odd";
             $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
         }
 
-//        arsort($medians);
         arsort($jokers);
         arsort($numbers_freq);
         arsort($even_odd_freq);
 
         return [
-//            'top_medians' => array_slice($medians, 0, 10, true),
             'top_jokers' => $jokers,
             'top_numbers' => $numbers_freq,
             'even_odd_stats' => $even_odd_freq,
             'sum_distribution' => $this->sumDistribution()->calculate($delays),
             'range_distribution' => $this->numberRangeDistribution()->calculate($delays->pluck('numbers')),
-            'number_delay' => $numberDelay,
-            'joker_delay' => $jokerDelay,
-            'total_draws_analyzed' => $totalDraws,
+            'number_delay' => $this->delays($delays, fn($draw) => $draw['numbers'], self::MAX_NUMBER),
+            'joker_delay' => $this->delays($delays, fn($draw) => [$draw['joker']], self::MAX_JOKER),
+            'total_draws_analyzed' => count($draws),
             'latest_draw_date' => File::get_latest_file_date($folder),
         ];
     }
 
+    /**
+     * Number of draws since each number was last drawn
+     *
+     * @param Collection $delays draws sorted from newest to oldest
+     * @param callable $numbersOf returns the numbers of a draw to track
+     * @param int $maxNumber highest tracked number
+     * @return array<int, int> number => delay, the total draws for numbers never drawn
+     */
+    private function delays(Collection $delays, callable $numbersOf, int $maxNumber): array
+    {
+        $delay = array_fill(1, $maxNumber, null);
+
+        foreach ($delays as $drawIndex => $draw) {
+            foreach ($numbersOf($draw) as $num) {
+                if (array_key_exists($num, $delay)) {
+                    $delay[$num] ??= $drawIndex;
+                }
+            }
+        }
+
+        return array_map(fn($value) => $value ?? $delays->count(), $delay);
+    }
 
     /**
+     * Picks the most frequent numbers out of 100 random draws weighted by the draw history
+     *
      * @return array[]
      * @throws FileNotFoundException
      * @throws Exception
      */
     public function run($folder = 'stats/joker'): array
     {
-        $finalStatistics = Cache::get('joker_draws');
-        if(is_null($finalStatistics)) {
-            $output = $this->load_files($folder);
-            $finalStatistics = $output['draws'];
+        $draws = Cache::get('joker_draws');
+        if (is_null($draws)) {
+            $draws = $this->load_files($folder)['draws'];
         }
 
-
-        if (empty($finalStatistics)) {
-            $folderPath = storage_path($folder);
-            throw new Exception("No data found in {$folderPath}. Using empty dataset.");
+        if (empty($draws)) {
+            throw new Exception("No data found in " . storage_path($folder));
         }
 
-        $jokerIndex = 5;
-
-        $joker = array_fill(1, 20, 0);
-        $number = array_fill(1, 45, 0);
-
-        foreach ($finalStatistics as $draw) {
-
-            for ($i = 0; $i < 5; $i++) {
-                if (isset($draw[$i])) {
-                    $number[$draw[$i]]++;
-                }
-            }
-
-            if (isset($draw[$jokerIndex])) {
-                $joker[$draw[$jokerIndex]]++;
+        // Every drawn number appears once per draw, so a random pick is weighted by its frequency
+        $numberPool = [];
+        $jokerPool = [];
+        foreach ($draws as $draw) {
+            array_push($numberPool, ...array_slice($draw, 0, self::PICK));
+            if (isset($draw[self::PICK])) {
+                $jokerPool[] = $draw[self::PICK];
             }
         }
 
-
-        $jokerStats = [];
-        foreach ($joker as $key => $value) {
-            $jokerStats = array_merge($jokerStats, array_fill(0, $value, $key));
-        }
-        shuffle($jokerStats);
-
-        $stats = [];
-        foreach ($number as $key => $value) {
-            $stats = array_merge($stats, array_fill(0, $value, $key));
-        }
-        shuffle($stats);
-
-        $draws = [];
+        $numberCounts = array_fill(1, self::MAX_NUMBER, 0);
+        $jokerCounts = array_fill(1, self::MAX_JOKER, 0);
         for ($i = 0; $i < 100; $i++) {
-            $draw = [
-                'numbers' => [],
-                'joker' => []
-            ];
-
-            while (count($draw['numbers']) === 0) {
-                $currentNumbers = [];
-                while (count($currentNumbers) < 5) {
-                    $val = $stats[array_rand($stats)];
-                    if (!in_array($val, $currentNumbers)) {
-                        $currentNumbers[] = $val;
-                    }
-                }
-                sort($currentNumbers);
-
-                $draw['numbers'] = $currentNumbers;
+            foreach ($this->pickDistinct($numberPool, self::PICK) as $num) {
+                $numberCounts[$num]++;
             }
-
-            while (count($draw['joker']) === 0) {
-                $currentJokers = [];
-                while (count($currentJokers) < 1) {
-                    $val = $jokerStats[array_rand($jokerStats)];
-                    if (!in_array($val, $currentJokers)) {
-                        $currentJokers[] = $val;
-                    }
-                }
-                sort($currentJokers);
-
-                $draw['joker'] = $currentJokers;
-            }
-
-            $draws[] = $draw;
+            $jokerCounts[$jokerPool[array_rand($jokerPool)]]++;
         }
 
-        $statisticsNumbers = array_fill(1, 45, 0);
-        $statisticsJoker = array_fill(1, 20, 0);
-
-        foreach ($draws as $d) {
-            foreach ($d['numbers'] as $n) {
-                $statisticsNumbers[$n]++;
-            }
-            foreach ($d['joker'] as $j) {
-                $statisticsJoker[$j]++;
-            }
-        }
-
-        arsort($statisticsNumbers);
-        $topNumbers = array_slice(array_keys($statisticsNumbers), 0, 10);
-        $finalNumbers = array_slice($topNumbers, 0, 5);
+        arsort($numberCounts);
+        $finalNumbers = array_slice(array_keys($numberCounts), 0, self::PICK);
         sort($finalNumbers);
 
-        arsort($statisticsJoker);
-        $topJokers = array_slice(array_keys($statisticsJoker), 0, 4);
-        $finalJokers = array_slice($topJokers, 0, 1);
-        sort($finalJokers);
-
+        arsort($jokerCounts);
 
         return [
             'numbers' => $finalNumbers,
-            'jokers' => $finalJokers,
+            'jokers' => [array_key_first($jokerCounts)],
         ];
+    }
+
+    private function pickDistinct(array $pool, int $count): array
+    {
+        $picked = [];
+        while (count($picked) < $count) {
+            $picked[$pool[array_rand($pool)]] = true;
+        }
+
+        return array_keys($picked);
     }
 
     public function getLatestDrawDate(string $folder = 'stats/joker'): array
     {
         $out = Cache::get('joker_latest_draw_date');
-        if($out) {
+        if ($out) {
             return $out;
         }
         $lastDraw = $this->load_files($folder)['lastDraw'];
 
-        if(count($lastDraw) ==0) {
+        if (empty($lastDraw)) {
             return [];
         }
 
@@ -270,6 +200,7 @@ class JokerService
         $finalStatistics = [];
         $stats = [];
         $lastDraw = [];
+        $lastDrawDate = null;
         $delays = [];
         foreach ($files as $file) {
             try {
@@ -278,49 +209,48 @@ class JokerService
                 $rows = $worksheet->toArray();
 
                 foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3 ) {
+                    // Skip header rows (first 3 rows)
+                    if ($index < 3) {
                         continue;
                     }
 
                     // The numbers start 2 columns after the date (which is at index 1)
                     // So numbers are at indices 2, 3, 4, 5, 6
-                    // Jokers are at indices 7
+                    // Joker is at index 7
                     $drawData = [];
                     for ($i = 2; $i <= 7; $i++) {
                         if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                            $drawData[] = (int) $row[$i];
                         }
                     }
 
-                    if (count($drawData) >= 6) {
-                        $finalStatistics[] = $drawData;
+                    // Skip incomplete rows, e.g. empty rows at the end of a sheet
+                    if (count($drawData) < self::PICK + 1) {
+                        continue;
                     }
 
-                    if (count($drawData) >= 6) {
-                        $numbers = array_map('intval', array_slice($drawData, 0, 5));
-                        $joker = intval($drawData[5]);
-                        sort($numbers);
-                        $stats[] = [
-                            'date' => $row[1],
-                            'numbers' => $numbers,
-                            'joker' => $joker
-                        ];
+                    $finalStatistics[] = $drawData;
 
-                        $delays[] = [
-                            'date' => Carbon::createFromFormat('d/m/Y', $row[1]),
-                            'numbers' => $numbers,
-                            'joker' => $joker
-                        ];
-                    }
+                    $numbers = array_slice($drawData, 0, self::PICK);
+                    sort($numbers);
+                    $joker = $drawData[self::PICK];
+                    $date = Carbon::createFromFormat('d/m/Y', $row[1]);
 
-                    if(count($lastDraw) ==0) {
+                    $stats[] = [
+                        'date' => $row[1],
+                        'numbers' => $numbers,
+                        'joker' => $joker
+                    ];
+
+                    $delays[] = [
+                        'date' => $date,
+                        'numbers' => $numbers,
+                        'joker' => $joker
+                    ];
+
+                    if (is_null($lastDrawDate) || $lastDrawDate->lt($date)) {
                         $lastDraw = $row;
-                    }
-                    $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
-                    $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
-                    if($previous_date->lt($current_date)) {
-                        $lastDraw = $row;
+                        $lastDrawDate = $date;
                     }
                 }
             } catch (Exception $e) {
@@ -328,7 +258,7 @@ class JokerService
             }
         }
         $delays = collect($delays)
-            ->sortByDesc(fn ($delay) => Carbon::parse($delay['date']))
+            ->sortByDesc(fn($delay) => $delay['date'])
             ->values();
         return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
     }
@@ -336,7 +266,7 @@ class JokerService
     public function checkCombination(array $userNumbers, array $userJokers): array
     {
         $history = Cache::get('joker_stats');
-        if(is_null($history)) {
+        if (is_null($history)) {
             $output = $this->load_files('stats/joker');
             $history = $output['stats'];
         }
@@ -410,8 +340,8 @@ class JokerService
     private function sumDistribution(): SumDistribution
     {
         return new SumDistribution(
-            pick: 5,
-            maxNumber: 45,
+            pick: self::PICK,
+            maxNumber: self::MAX_NUMBER,
             bucketEdges: [65, 85, 105, 125, 145, 165],
             optimalRange: ['min' => 90, 'max' => 140],
             moderateRange: ['min' => 70, 'max' => 160],
@@ -434,14 +364,14 @@ class JokerService
         ]);
     }
 
-    private function getNextDrawDate()
+    private function getNextDrawDate(): string
     {
         $now = Carbon::now()->subDays(1);
         return collect([
             Carbon::SUNDAY,
             Carbon::TUESDAY,
             Carbon::THURSDAY,
-        ])->map(fn ($day) => $now->copy()->next($day))
+        ])->map(fn($day) => $now->copy()->next($day))
             ->sort()
             ->first()
             ->format('d/m/Y');
