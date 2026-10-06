@@ -13,19 +13,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class EurojackpotService
 {
     /**
-     * Max - min spread buckets of the 5 main numbers (possible spread 4 – 49, theoretical mean 34)
-     */
-    private const NUMBER_RANGE_BUCKETS = [
-        '4-19' => [4, 19],
-        '20-24' => [20, 24],
-        '25-29' => [25, 29],
-        '30-34' => [30, 34],
-        '35-39' => [35, 39],
-        '40-44' => [40, 44],
-        '45-49' => [45, 49],
-    ];
-
-    /**
      * @return array[]
      * @throws FileNotFoundException
      */
@@ -188,8 +175,6 @@ class EurojackpotService
 
         $jokerPairsFrequency = [];
         $even_odd_freq = [];
-        $numberRangeFrequency = array_fill_keys(array_keys(self::NUMBER_RANGE_BUCKETS), 0);
-        $jokerRangeFrequency = array_fill(1, 11, 0);
         foreach ($delays as $drawIndex => $draw) {
 
             $numbers = $draw['numbers'];
@@ -231,11 +216,6 @@ class EurojackpotService
 
                 }
             }
-            $mainNumbers = array_slice($draw, 0, 5);
-            if (count($mainNumbers) === 5) {
-                $numberRangeFrequency[$this->numberRangeBucket(max($mainNumbers) - min($mainNumbers))]++;
-            }
-
             $evenOddKey = "{$evenCount} even / {$oddCount} odd";
             $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
 
@@ -251,11 +231,6 @@ class EurojackpotService
             }
 
             if (count($jokers) === 2) {
-                $jokerRange = max($jokers) - min($jokers);
-                if ($jokerRange > 0) {
-                    $jokerRangeFrequency[$jokerRange]++;
-                }
-
                 sort($jokers);
                 $pair = implode('-', $jokers);
                 if (!isset($jokerPairsFrequency[$pair])) {
@@ -291,8 +266,8 @@ class EurojackpotService
             'even_odd_stats' => $even_odd_freq,
             'sum_distribution' => $this->sumDistribution()->calculate($delays),
             'range_distribution' => [
-                'numbers' => $this->rangeDistribution($numberRangeFrequency),
-                'jokers' => $this->rangeDistribution($jokerRangeFrequency),
+                'numbers' => $this->numberRangeDistribution()->calculate($delays->pluck('numbers')),
+                'jokers' => RangeDistribution::perValue(1, 11)->calculate($delays->pluck('jokers')),
             ],
             'total_draws_analyzed' => count($allDraws),
             'latest_draw_date' => File::get_latest_file_date($folder),
@@ -497,36 +472,20 @@ class EurojackpotService
         );
     }
 
-    private function numberRangeBucket(int $range): string
-    {
-        foreach (self::NUMBER_RANGE_BUCKETS as $label => [$min, $max]) {
-            if ($range >= $min && $range <= $max) {
-                return $label;
-            }
-        }
-
-        return array_key_last(self::NUMBER_RANGE_BUCKETS);
-    }
-
     /**
-     * @param array $frequency range label => draw count
-     * @return array
+     * 5 of 50: possible spread 4 – 49, theoretical mean 34
      */
-    private function rangeDistribution(array $frequency): array
+    private function numberRangeDistribution(): RangeDistribution
     {
-        $total = array_sum($frequency);
-        $maxCount = max($frequency);
-
-        return [
-            'buckets' => collect($frequency)->map(fn ($count, $label) => [
-                'label' => (string)$label,
-                'count' => $count,
-                'percentage' => $total > 0 ? round($count / $total * 100, 1) : 0,
-            ])->values()->all(),
-            'max_count' => $maxCount,
-            'most_frequent' => (string)array_search($maxCount, $frequency),
-            'total' => $total,
-        ];
+        return new RangeDistribution([
+            '4-19' => [4, 19],
+            '20-24' => [20, 24],
+            '25-29' => [25, 29],
+            '30-34' => [30, 34],
+            '35-39' => [35, 39],
+            '40-44' => [40, 44],
+            '45-49' => [45, 49],
+        ]);
     }
 
     private function getNextDrawDate()

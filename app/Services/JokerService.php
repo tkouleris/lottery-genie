@@ -113,6 +113,7 @@ class JokerService
             'top_numbers' => $numbers_freq,
             'even_odd_stats' => $even_odd_freq,
             'sum_distribution' => $this->sumDistribution()->calculate($delays),
+            'range_distribution' => $this->numberRangeDistribution()->calculate($delays->pluck('numbers')),
             'number_delay' => $numberDelay,
             'joker_delay' => $jokerDelay,
             'total_draws_analyzed' => $totalDraws,
@@ -415,6 +416,22 @@ class JokerService
             optimalRange: ['min' => 90, 'max' => 140],
             moderateRange: ['min' => 70, 'max' => 160],
         );
+    }
+
+    /**
+     * 5 of 45: possible spread 4 – 44, theoretical mean 30.7
+     */
+    private function numberRangeDistribution(): RangeDistribution
+    {
+        return new RangeDistribution([
+            '4-14' => [4, 14],
+            '15-19' => [15, 19],
+            '20-24' => [20, 24],
+            '25-29' => [25, 29],
+            '30-34' => [30, 34],
+            '35-39' => [35, 39],
+            '40-44' => [40, 44],
+        ]);
     }
 
     private function getNextDrawDate()

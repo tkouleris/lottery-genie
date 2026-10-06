@@ -121,35 +121,13 @@
         @include('partials.sum_distribution', ['sumStats' => $stats['sum_distribution'], 'sumCheckerRoute' => 'eurojackpot.sum-checker'])
 
         <!-- Max - Min Range Distribution -->
-        <section class="card-glass rounded-3xl p-8">
-            <h2 class="text-2xl font-bold mb-2 text-cyan-400">Range Distribution (Max − Min)</h2>
-            <p class="text-slate-400 text-sm mb-6">
-                Spread between the highest and lowest number of each draw. Example: 1, 2, 3, 4, 5 and 1, 12 gives a main range of 4 and a Eurozahlen range of 11.
-            </p>
-            <div class="grid md:grid-cols-2 gap-8">
-                @foreach([
-                    ['title' => 'Main Numbers (possible 4 – 49)', 'color' => 'text-blue-300', 'bar' => 'from-blue-700 to-blue-400', 'data' => $stats['range_distribution']['numbers']],
-                    ['title' => 'Eurozahlen (possible 1 – 11)', 'color' => 'text-yellow-300', 'bar' => 'from-yellow-600 to-yellow-400', 'data' => $stats['range_distribution']['jokers']],
-                ] as $range)
-                    <div>
-                        <h3 class="text-xl font-bold mb-4 {{ $range['color'] }}">{{ $range['title'] }}</h3>
-                        <div class="space-y-2">
-                            @foreach($range['data']['buckets'] as $bucket)
-                                @php $isTop = $bucket['label'] === $range['data']['most_frequent']; @endphp
-                                <div class="flex items-center gap-3">
-                                    <span class="w-12 text-right text-sm font-bold {{ $isTop ? 'text-cyan-300' : 'text-slate-300' }}">{{ $bucket['label'] }}</span>
-                                    <div class="flex-1 h-5 rounded-lg bg-slate-800/50 overflow-hidden">
-                                        <div class="h-full rounded-lg bg-gradient-to-r {{ $isTop ? 'from-cyan-600 to-cyan-400' : $range['bar'] }}"
-                                             style="width: {{ $range['data']['max_count'] > 0 ? max(1, round($bucket['count'] / $range['data']['max_count'] * 100)) : 1 }}%"></div>
-                                    </div>
-                                    <span class="w-28 text-right text-xs text-slate-400">{{ $bucket['count'] }} dr. ({{ $bucket['percentage'] }}%)</span>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </section>
+        @include('partials.range_distribution', [
+            'rangeExample' => 'Example: 1, 2, 3, 4, 5 and 1, 12 gives a main range of 4 and a Eurozahlen range of 11.',
+            'rangeSeries' => [
+                ['title' => 'Main Numbers (possible 4 – 49)', 'color' => 'text-blue-300', 'bar' => 'from-blue-700 to-blue-400', 'data' => $stats['range_distribution']['numbers']],
+                ['title' => 'Eurozahlen (possible 1 – 11)', 'color' => 'text-yellow-300', 'bar' => 'from-yellow-600 to-yellow-400', 'data' => $stats['range_distribution']['jokers']],
+            ],
+        ])
     </div>
 
     <div class="mt-8 text-center">

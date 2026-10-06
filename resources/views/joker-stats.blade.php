@@ -91,6 +91,13 @@
             'sumStats' => $stats['sum_distribution'],
             'sumCheckerRoute' => 'joker.sum-checker',
         ])
+        <!-- Max - Min Range Distribution -->
+        @include('partials.range_distribution', [
+            'rangeExample' => 'Example: 1, 2, 3, 4, 5 gives a range of 4. The single joker number has no range.',
+            'rangeSeries' => [
+                ['title' => 'Main Numbers (possible 4 – 44)', 'color' => 'text-blue-300', 'bar' => 'from-blue-700 to-blue-400', 'data' => $stats['range_distribution']],
+            ],
+        ])
         <div class="grid md:grid-cols-1 gap-8">
 
 
