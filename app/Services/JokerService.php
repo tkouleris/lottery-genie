@@ -20,21 +20,31 @@ class JokerService
     private const MAX_NUMBER = 45;
     private const MAX_JOKER = 20;
 
+    private const FOLDER = 'stats/joker';
+
+    /**
+     * Cache keys filled by the app:cache-joker command
+     */
+    private const CACHE_DRAWS = 'joker_draws';
+    private const CACHE_STATS = 'joker_stats';
+    private const CACHE_DELAYS = 'joker_delays';
+    private const CACHE_LATEST_DRAW_DATE = 'joker_latest_draw_date';
+
+    /**
+     * load_files() output per folder, so a request parses the xlsx files at most once
+     */
+    private array $loadedFiles = [];
+
     /**
      * @param string $folder
      * @return array
      * @throws FileNotFoundException
      * @throws Exception
      */
-    public function getStats(string $folder = 'stats/joker'): array
+    public function getStats(string $folder = self::FOLDER): array
     {
-        $draws = Cache::get('joker_stats');
-        $delays = Cache::get('joker_delays');
-        if (is_null($draws) || is_null($delays)) {
-            $output = $this->load_files($folder);
-            $draws = $output['stats'];
-            $delays = $output['delays'];
-        }
+        $draws = $this->cachedOrLoaded(self::CACHE_STATS, 'stats', $folder);
+        $delays = $this->cachedOrLoaded(self::CACHE_DELAYS, 'delays', $folder);
 
         if (empty($draws)) {
             throw new Exception("No data found in " . storage_path($folder));
@@ -115,12 +125,9 @@ class JokerService
      * @throws FileNotFoundException
      * @throws Exception
      */
-    public function run($folder = 'stats/joker'): array
+    public function run(string $folder = self::FOLDER): array
     {
-        $draws = Cache::get('joker_draws');
-        if (is_null($draws)) {
-            $draws = $this->load_files($folder)['draws'];
-        }
+        $draws = $this->cachedOrLoaded(self::CACHE_DRAWS, 'draws', $folder);
 
         if (empty($draws)) {
             throw new Exception("No data found in " . storage_path($folder));
@@ -167,13 +174,13 @@ class JokerService
         return array_keys($picked);
     }
 
-    public function getLatestDrawDate(string $folder = 'stats/joker'): array
+    public function getLatestDrawDate(string $folder = self::FOLDER): array
     {
-        $out = Cache::get('joker_latest_draw_date');
+        $out = Cache::get(self::CACHE_LATEST_DRAW_DATE);
         if ($out) {
             return $out;
         }
-        $lastDraw = $this->load_files($folder)['lastDraw'];
+        $lastDraw = $this->loadFilesOnce($folder)['lastDraw'];
 
         if (empty($lastDraw)) {
             return [];
@@ -194,7 +201,7 @@ class JokerService
      * @return array
      * @throws FileNotFoundException
      */
-    public function load_files(string $folder = 'stats/joker'): array
+    public function load_files(string $folder = self::FOLDER): array
     {
         $files = File::load_xlsx_files($folder);
         $finalStatistics = [];
@@ -263,14 +270,30 @@ class JokerService
         return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
     }
 
-    public function checkCombination(array $userNumbers, array $userJokers): array
+    /**
+     * @param string $cacheKey cache key filled by the app:cache-joker command
+     * @param string $outputKey matching load_files() output key, used on a cache miss
+     * @throws FileNotFoundException
+     */
+    private function cachedOrLoaded(string $cacheKey, string $outputKey, string $folder): mixed
     {
-        $history = Cache::get('joker_stats');
-        if (is_null($history)) {
-            $output = $this->load_files('stats/joker');
-            $history = $output['stats'];
-        }
+        return Cache::get($cacheKey) ?? $this->loadFilesOnce($folder)[$outputKey];
+    }
 
+    /**
+     * @throws FileNotFoundException
+     */
+    private function loadFilesOnce(string $folder): array
+    {
+        return $this->loadedFiles[$folder] ??= $this->load_files($folder);
+    }
+
+    /**
+     * @throws FileNotFoundException
+     */
+    public function checkCombination(array $userNumbers, array $userJokers, string $folder = self::FOLDER): array
+    {
+        $history = $this->cachedOrLoaded(self::CACHE_STATS, 'stats', $folder);
 
         sort($userNumbers);
         // Joker for Joker game is usually just one number, but we'll handle it as array for consistency
@@ -296,12 +319,12 @@ class JokerService
             $numCount = count($matchingNumbers);
             $jokerCount = count($matchingJokers);
 
-            if ($numCount === 5 && $jokerCount === 1) {
+            if ($numCount === self::PICK && $jokerCount === 1) {
                 $results['exact_matches']++;
             }
 
             // Joker tiers: 5+1, 5, 4+1, 4, 3+1, 3, 2+1, 1+1
-            if (($numCount === 5) || ($numCount >= 1 && $jokerCount === 1) || ($numCount >= 3)) {
+            if ($numCount === self::PICK || ($numCount >= 1 && $jokerCount === 1) || $numCount >= 3) {
                 $tier = "{$numCount}+{$jokerCount}";
                 $results['breakdown'][$tier] = ($results['breakdown'][$tier] ?? 0) + 1;
 
@@ -324,14 +347,9 @@ class JokerService
      * @return array
      * @throws FileNotFoundException
      */
-    public function getSumDistribution(string $folder = 'stats/joker'): array
+    public function getSumDistribution(string $folder = self::FOLDER): array
     {
-        $delays = Cache::get('joker_delays');
-        if (is_null($delays)) {
-            $delays = $this->load_files($folder)['delays'];
-        }
-
-        return $this->sumDistribution()->calculate($delays);
+        return $this->sumDistribution()->calculate($this->cachedOrLoaded(self::CACHE_DELAYS, 'delays', $folder));
     }
 
     /**
