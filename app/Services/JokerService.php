@@ -73,22 +73,22 @@ class JokerService
         $totalDraws = count($draws);
 
         foreach ($draws as $draw) {
-            $numbers = $draw['numbers']; // Ήδη ταξινομημένα
+            $numbers = $draw['numbers']; // Already sorted
             $joker = $draw['joker'];
 
-            // 1. Διάμεσος (ο 3ος αριθμός στην πεντάδα)
+            // 1. Median (the 3rd number of the five)
 //            $median = $numbers[2];
 //            $medians[$median] = ($medians[$median] ?? 0) + 1;
 
-            // 2. Τζόκερ
+            // 2. Joker
             $jokers[$joker] = ($jokers[$joker] ?? 0) + 1;
 
-            // 3. Απλά νούμερα
+            // 3. Main numbers
             foreach ($numbers as $num) {
                 $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
             }
 
-            // 4. Συχνότητα Even / Odd (για τα 5 νούμερα)
+            // 4. Even / Odd frequency (for the 5 numbers)
             $evenCount = 0;
             $oddCount = 0;
             foreach ($numbers as $num) {

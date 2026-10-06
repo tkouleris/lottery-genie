@@ -61,22 +61,22 @@ class LottoService
         }
 
         foreach ($draws as $draw) {
-            $numbers = $draw['numbers']; // Ήδη ταξινομημένα
+            $numbers = $draw['numbers']; // Already sorted
 
-            // 1. Συχνότητα εμφάνισης αριθμών
+            // 1. Number frequency
             foreach ($numbers as $num) {
                 $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
             }
 
 
-            // 3. Πιο συχνές 3άδες
+            // 2. Most frequent triples
             $triples = $this->getCombinations($numbers, 3);
             foreach ($triples as $triple) {
                 $key = implode(',', $triple);
                 $triples_freq[$key] = ($triples_freq[$key] ?? 0) + 1;
             }
 
-            // 4. Συχνότητα Even / Odd
+            // 3. Even / Odd frequency
             $evenCount = 0;
             $oddCount = 0;
             foreach ($numbers as $num) {
