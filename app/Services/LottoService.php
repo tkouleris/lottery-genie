@@ -39,7 +39,6 @@ class LottoService
     private function calculateStatistics(array $draws, Collection $delays, string $folder): array
     {
         $numbers_freq = [];
-        $differences_freq = [];
         $triples_freq = [];
         $even_odd_freq = [];
         $totalDraws = count($draws);
@@ -69,15 +68,6 @@ class LottoService
                 $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
             }
 
-            // 2. Διαφορά (max - min) με ομαδοποίηση σε κλάσεις
-            $diff = max($numbers) - min($numbers);
-            if ($diff < 10) {
-                $class = '<10';
-            } else {
-                $base = floor($diff / 10) * 10;
-                $class = '>=' . $base;
-            }
-            $differences_freq[$class] = ($differences_freq[$class] ?? 0) + 1;
 
             // 3. Πιο συχνές 3άδες
             $triples = $this->getCombinations($numbers, 3);
@@ -101,16 +91,15 @@ class LottoService
         }
 
         arsort($numbers_freq);
-        arsort($differences_freq);
         arsort($triples_freq);
         arsort($even_odd_freq);
 
         return [
             'top_numbers' => $numbers_freq,
-            'top_differences' => array_slice($differences_freq, 0, 10, true),
             'top_triples' => array_slice($triples_freq, 0, 10, true),
             'even_odd_stats' => $even_odd_freq,
             'sum_distribution' => $this->sumDistribution()->calculate($delays),
+            'range_distribution' => $this->numberRangeDistribution()->calculate($delays->pluck('numbers')),
             'total_draws_analyzed' => $totalDraws,
             'number_delay' => $numberDelay,
             'latest_draw_date' => File::get_latest_file_date($folder),
@@ -384,6 +373,22 @@ class LottoService
             optimalRange: ['min' => 120, 'max' => 180],
             moderateRange: ['min' => 100, 'max' => 200],
         );
+    }
+
+    /**
+     * 6 of 49: possible spread 5 – 48, theoretical mean 35.7
+     */
+    private function numberRangeDistribution(): RangeDistribution
+    {
+        return new RangeDistribution([
+            '5-19' => [5, 19],
+            '20-24' => [20, 24],
+            '25-29' => [25, 29],
+            '30-34' => [30, 34],
+            '35-39' => [35, 39],
+            '40-44' => [40, 44],
+            '45-48' => [45, 48],
+        ]);
     }
 
     private function getNextDrawDate()

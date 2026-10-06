@@ -53,22 +53,7 @@
             </div>
         </section>
 
-        <div class="grid md:grid-cols-2 gap-8">
-            <!-- Differences Classes -->
-            <section class="card-glass rounded-3xl p-8">
-                <h2 class="text-2xl font-bold mb-2 text-green-400">Most Frequent Differences (Max-Min)</h2>
-                <p class="text-slate-400 text-sm mb-6">Frequency of the difference between the highest and lowest number in
-                    a draw.</p>
-                <div class="space-y-4">
-                    @foreach ($stats['top_differences'] as $class => $count)
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/50">
-                            <span class="text-lg font-bold text-slate-300">{{ $class }}</span>
-                            <span class="font-bold text-slate-300">{{ $count }} times</span>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
-
+        <div class="grid md:grid-cols-1 gap-8">
             <!-- Even / Odd Frequency -->
             <section class="card-glass rounded-3xl p-8">
                 <h2 class="text-2xl font-bold mb-2 text-yellow-400">Even / Odd Combinations</h2>
@@ -109,6 +94,19 @@
         @include('partials.sum_distribution', [
             'sumStats' => $stats['sum_distribution'],
             'sumCheckerRoute' => 'lotto.sum-checker',
+        ])
+
+        <!-- Max - Min Range Distribution -->
+        @include('partials.range_distribution', [
+            'rangeExample' => 'Example: 1, 2, 3, 4, 5, 6 gives a range of 5.',
+            'rangeSeries' => [
+                [
+                    'title' => 'Main Numbers (possible 5 – 48)',
+                    'color' => 'text-blue-300',
+                    'bar' => 'from-blue-700 to-blue-400',
+                    'data' => $stats['range_distribution'],
+                ],
+            ],
         ])
     </div>
 
