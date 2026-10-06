@@ -14,20 +14,36 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class LottoService
 {
     /**
+     * Lotto draws 6 numbers of 49
+     */
+    private const PICK = 6;
+    private const MAX_NUMBER = 49;
+
+    private const FOLDER = 'stats/lotto';
+
+    /**
+     * Cache keys filled by the app:cache-lotto command
+     */
+    private const CACHE_DRAWS = 'lotto_draws';
+    private const CACHE_STATS = 'lotto_stats';
+    private const CACHE_DELAYS = 'lotto_delays';
+    private const CACHE_LATEST_DRAW_DATE = 'lotto_latest_draw_date';
+
+    /**
+     * load_files() output per folder, so a request parses the xlsx files at most once
+     */
+    private array $loadedFiles = [];
+
+    /**
      * @param string $folder
      * @return array
      * @throws FileNotFoundException
      * @throws Exception
      */
-    public function getStats(string $folder = 'stats/lotto'): array
+    public function getStats(string $folder = self::FOLDER): array
     {
-        $draws = Cache::get('lotto_stats');
-        $delays = Cache::get('lotto_delays');
-        if (is_null($draws)) {
-            $output = $this->load_files($folder);
-            $draws = $output['stats'];
-            $delays = $output['delays'];
-        }
+        $draws = $this->cachedOrLoaded(self::CACHE_STATS, 'stats', $folder);
+        $delays = $this->cachedOrLoaded(self::CACHE_DELAYS, 'delays', $folder);
 
         if (empty($draws)) {
             throw new Exception("No data found in " . storage_path($folder));
@@ -41,24 +57,6 @@ class LottoService
         $numbers_freq = [];
         $triples_freq = [];
         $even_odd_freq = [];
-        $totalDraws = count($draws);
-
-        $numbersFound = array_fill(1, 49, false);
-        $numberDelay = array_fill(1, 49, 0);
-        foreach ($delays as $drawIndex => $draw) {
-            $numbers = $draw['numbers'];
-            for ($i = 0; $i < 6; $i++) {
-                if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 49) {
-                    $num = $numbers[$i];
-
-                    if (!$numbersFound[$num]) {
-                        $numberDelay[$num] = $drawIndex;
-                        $numbersFound[$num] = true;
-                    }
-                }
-            }
-
-        }
 
         foreach ($draws as $draw) {
             $numbers = $draw['numbers']; // Already sorted
@@ -68,24 +66,15 @@ class LottoService
                 $numbers_freq[$num] = ($numbers_freq[$num] ?? 0) + 1;
             }
 
-
             // 2. Most frequent triples
-            $triples = $this->getCombinations($numbers, 3);
-            foreach ($triples as $triple) {
+            foreach ($this->getCombinations($numbers, 3) as $triple) {
                 $key = implode(',', $triple);
                 $triples_freq[$key] = ($triples_freq[$key] ?? 0) + 1;
             }
 
             // 3. Even / Odd frequency
-            $evenCount = 0;
-            $oddCount = 0;
-            foreach ($numbers as $num) {
-                if ($num % 2 === 0) {
-                    $evenCount++;
-                } else {
-                    $oddCount++;
-                }
-            }
+            $evenCount = count(array_filter($numbers, fn($num) => $num % 2 === 0));
+            $oddCount = count($numbers) - $evenCount;
             $evenOddKey = "{$evenCount} even / {$oddCount} odd";
             $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
         }
@@ -100,10 +89,31 @@ class LottoService
             'even_odd_stats' => $even_odd_freq,
             'sum_distribution' => $this->sumDistribution()->calculate($delays),
             'range_distribution' => $this->numberRangeDistribution()->calculate($delays->pluck('numbers')),
-            'total_draws_analyzed' => $totalDraws,
-            'number_delay' => $numberDelay,
+            'total_draws_analyzed' => count($draws),
+            'number_delay' => $this->delays($delays),
             'latest_draw_date' => File::get_latest_file_date($folder),
         ];
+    }
+
+    /**
+     * Number of draws since each number was last drawn
+     *
+     * @param Collection $delays draws sorted from newest to oldest
+     * @return array<int, int> number => delay, the total draws for numbers never drawn
+     */
+    private function delays(Collection $delays): array
+    {
+        $delay = array_fill(1, self::MAX_NUMBER, null);
+
+        foreach ($delays as $drawIndex => $draw) {
+            foreach ($draw['numbers'] as $num) {
+                if (array_key_exists($num, $delay)) {
+                    $delay[$num] ??= $drawIndex;
+                }
+            }
+        }
+
+        return array_map(fn($value) => $value ?? $delays->count(), $delay);
     }
 
     /**
@@ -134,90 +144,60 @@ class LottoService
     }
 
     /**
+     * Picks the most frequent numbers out of 100 random draws weighted by the draw history
+     *
      * @return array[]
      * @throws FileNotFoundException|Exception
      */
-    public function run($folder = 'stats/lotto'): array
+    public function run(string $folder = self::FOLDER): array
     {
-        $finalStatistics = Cache::get('lotto_draws');
-        if (is_null($finalStatistics)) {
-            $output = $this->load_files($folder);
-            $finalStatistics = $output['draws'];
+        $draws = $this->cachedOrLoaded(self::CACHE_DRAWS, 'draws', $folder);
+
+        if (empty($draws)) {
+            throw new Exception("No data found in " . storage_path($folder));
         }
 
-        if (empty($finalStatistics)) {
-            $folderPath = storage_path($folder);
-            throw new Exception("No data found in {$folderPath}. Using empty dataset.");
+        // Every drawn number appears once per draw, so a random pick is weighted by its frequency
+        $numberPool = [];
+        foreach ($draws as $draw) {
+            array_push($numberPool, ...array_slice($draw, 0, self::PICK));
         }
 
-        $number = array_fill(1, 49, 0);
-
-        foreach ($finalStatistics as $draw) {
-            for ($i = 0; $i < 6; $i++) {
-                if (isset($draw[$i])) {
-                    $number[$draw[$i]]++;
-                }
-            }
-        }
-
-        $stats = [];
-        foreach ($number as $key => $value) {
-            $stats = array_merge($stats, array_fill(0, $value, $key));
-        }
-        shuffle($stats);
-
-
-        $draws = [];
+        $numberCounts = array_fill(1, self::MAX_NUMBER, 0);
         for ($i = 0; $i < 100; $i++) {
-            $draw = [
-                'numbers' => [],
-            ];
-
-            while (count($draw['numbers']) === 0) {
-                $currentNumbers = [];
-                while (count($currentNumbers) < 6) {
-                    $val = $stats[array_rand($stats)];
-                    if (!in_array($val, $currentNumbers)) {
-                        $currentNumbers[] = $val;
-                    }
-                }
-                sort($currentNumbers);
-
-                $draw['numbers'] = $currentNumbers;
-            }
-
-            $draws[] = $draw;
-        }
-
-        $statisticsNumbers = array_fill(1, 49, 0);
-
-        foreach ($draws as $d) {
-            foreach ($d['numbers'] as $n) {
-                $statisticsNumbers[$n]++;
+            foreach ($this->pickDistinct($numberPool, self::PICK) as $num) {
+                $numberCounts[$num]++;
             }
         }
 
-        arsort($statisticsNumbers);
-        $topNumbers = array_slice(array_keys($statisticsNumbers), 0, 10);
-        $finalNumbers = array_slice($topNumbers, 0, 6);
+        arsort($numberCounts);
+        $finalNumbers = array_slice(array_keys($numberCounts), 0, self::PICK);
         sort($finalNumbers);
-
-
 
         return [
             'numbers' => $finalNumbers,
         ];
     }
 
-    public function getLatestDrawDate(string $folder = 'stats/lotto'): array
+    private function pickDistinct(array $pool, int $count): array
     {
-        $out = Cache::get('lotto_latest_draw_date');
+        $picked = [];
+        while (count($picked) < $count) {
+            $picked[$pool[array_rand($pool)]] = true;
+        }
+
+        return array_keys($picked);
+    }
+
+    public function getLatestDrawDate(string $folder = self::FOLDER): array
+    {
+        $out = Cache::get(self::CACHE_LATEST_DRAW_DATE);
         if ($out) {
             return $out;
         }
-        $lastDraw = $this->load_files($folder)['lastDraw'];
+        $lastDraw = $this->loadFilesOnce($folder)['lastDraw'];
 
-        if (count($lastDraw) == 0) {
+        if (empty($lastDraw)) {
             return [];
         }
 
@@ -236,13 +216,14 @@ class LottoService
      * @return array
      * @throws FileNotFoundException
      */
-    public function load_files(string $folder = 'stats/lotto'): array
+    public function load_files(string $folder = self::FOLDER): array
     {
         $files = File::load_xlsx_files($folder);
 
         $finalStatistics = [];
         $stats = [];
         $lastDraw = [];
+        $lastDrawDate = null;
         $delays = [];
         foreach ($files as $file) {
             try {
@@ -251,43 +232,44 @@ class LottoService
                 $rows = $worksheet->toArray();
 
                 foreach ($rows as $index => $row) {
-                    // Skip header rows (first 3 rows) and non-numeric rows
+                    // Skip header rows (first 4 rows)
                     if ($index < 4) {
                         continue;
                     }
 
+                    // The numbers start 2 columns after the date (which is at index 1)
+                    // So numbers are at indices 2, 3, 4, 5, 6, 7
                     $drawData = [];
                     for ($i = 2; $i <= 7; $i++) {
                         if (isset($row[$i]) && is_numeric($row[$i])) {
                             $drawData[] = (int) $row[$i];
                         }
                     }
-                    if (count($drawData) >= 6) {
-                        $finalStatistics[] = array_map('intval', array_values($drawData));
+
+                    // Skip incomplete rows, e.g. empty rows at the end of a sheet
+                    if (count($drawData) < self::PICK) {
+                        continue;
                     }
 
-                    if (count($drawData) >= 6) {
-                        $numbers = array_map('intval', array_slice($drawData, 0, 6));
-                        sort($numbers);
-                        $stats[] = [
-                            'date' => $row[1],
-                            'numbers' => $numbers
-                        ];
+                    $finalStatistics[] = $drawData;
 
-                        $delays[] = [
-                            'date' => Carbon::createFromFormat('d/m/Y', $row[1]),
-                            'numbers' => $numbers
-                        ];
-                    }
+                    $numbers = $drawData;
+                    sort($numbers);
+                    $date = Carbon::createFromFormat('d/m/Y', $row[1]);
 
-                    if (count($lastDraw) == 0) {
+                    $stats[] = [
+                        'date' => $row[1],
+                        'numbers' => $numbers
+                    ];
+
+                    $delays[] = [
+                        'date' => $date,
+                        'numbers' => $numbers
+                    ];
+
+                    if (is_null($lastDrawDate) || $lastDrawDate->lt($date)) {
                         $lastDraw = $row;
-                    }
-
-                    $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
-                    $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
-                    if ($previous_date->lt($current_date)) {
-                        $lastDraw = $row;
+                        $lastDrawDate = $date;
                     }
                 }
             } catch (Exception $e) {
@@ -295,18 +277,35 @@ class LottoService
             }
         }
         $delays = collect($delays)
-            ->sortByDesc(fn($delay) => Carbon::parse($delay['date']))
+            ->sortByDesc(fn($delay) => $delay['date'])
             ->values();
         return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
     }
 
-    public function checkCombination(array $userNumbers): array
+    /**
+     * @param string $cacheKey cache key filled by the app:cache-lotto command
+     * @param string $outputKey matching load_files() output key, used on a cache miss
+     * @throws FileNotFoundException
+     */
+    private function cachedOrLoaded(string $cacheKey, string $outputKey, string $folder): mixed
     {
-        $history = Cache::get('lotto_stats');
-        if (is_null($history)) {
-            $output = $this->load_files();
-            $history = $output['stats'];
-        }
+        return Cache::get($cacheKey) ?? $this->loadFilesOnce($folder)[$outputKey];
+    }
+
+    /**
+     * @throws FileNotFoundException
+     */
+    private function loadFilesOnce(string $folder): array
+    {
+        return $this->loadedFiles[$folder] ??= $this->load_files($folder);
+    }
+
+    /**
+     * @throws FileNotFoundException
+     */
+    public function checkCombination(array $userNumbers, string $folder = self::FOLDER): array
+    {
+        $history = $this->cachedOrLoaded(self::CACHE_STATS, 'stats', $folder);
 
         sort($userNumbers);
 
@@ -325,7 +324,7 @@ class LottoService
             $matchingNumbers = array_intersect($userNumbers, $draw['numbers']);
             $numCount = count($matchingNumbers);
 
-            if ($numCount === 6) {
+            if ($numCount === self::PICK) {
                 $results['exact_matches']++;
             }
 
@@ -351,14 +350,9 @@ class LottoService
      * @return array
      * @throws FileNotFoundException
      */
-    public function getSumDistribution(string $folder = 'stats/lotto'): array
+    public function getSumDistribution(string $folder = self::FOLDER): array
     {
-        $delays = Cache::get('lotto_delays');
-        if (is_null($delays)) {
-            $delays = $this->load_files($folder)['delays'];
-        }
-
-        return $this->sumDistribution()->calculate($delays);
+        return $this->sumDistribution()->calculate($this->cachedOrLoaded(self::CACHE_DELAYS, 'delays', $folder));
     }
 
     /**
@@ -367,8 +361,8 @@ class LottoService
     private function sumDistribution(): SumDistribution
     {
         return new SumDistribution(
-            pick: 6,
-            maxNumber: 49,
+            pick: self::PICK,
+            maxNumber: self::MAX_NUMBER,
             bucketEdges: [100, 120, 140, 160, 180, 200],
             optimalRange: ['min' => 120, 'max' => 180],
             moderateRange: ['min' => 100, 'max' => 200],
@@ -391,7 +385,7 @@ class LottoService
         ]);
     }
 
-    private function getNextDrawDate()
+    private function getNextDrawDate(): string
     {
         $now = Carbon::now()->subDays(1);
         return collect([
