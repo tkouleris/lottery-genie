@@ -96,11 +96,11 @@
                     </div>
                 </div>
                 <a href="{{ route('about') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">{{ __('About') }}</a>
-                <div class="flex items-center gap-1 text-xs md:text-sm font-semibold">
-                    @foreach(config('app.available_locales') as $code => $label)
-                        <a href="{{ route('locale', $code) }}" hreflang="{{ $code }}" class="px-2 py-1 rounded-lg transition-colors {{ app()->getLocale() === $code ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white' }}">{{ $label }}</a>
-                    @endforeach
-                </div>
+                @foreach(collect(config('app.available_locales'))->except(app()->getLocale()) as $code => $label)
+                    <a href="{{ route('locale', $code) }}" hreflang="{{ $code }}" title="{{ $label }}" aria-label="{{ $label }}" class="flex items-center opacity-80 hover:opacity-100 transition-opacity">
+                        @include('partials.flags.' . $code, ['class' => 'h-5 w-auto rounded-sm shadow'])
+                    </a>
+                @endforeach
             </div>
         </div>
     </nav>

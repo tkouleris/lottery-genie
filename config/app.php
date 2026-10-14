@@ -103,14 +103,15 @@ return [
     | Available Locales
     |--------------------------------------------------------------------------
     |
-    | The locales a visitor can switch to, keyed by locale code with the label
-    | shown in the language switcher.
+    | The locales a visitor can switch to, keyed by locale code with the name
+    | shown as the language switcher's tooltip. Each locale needs a flag in
+    | resources/views/partials/flags/{locale}.blade.php.
     |
     */
 
     'available_locales' => [
-        'en' => 'EN',
-        'el' => 'ΕΛ',
+        'en' => 'English',
+        'el' => 'Ελληνικά',
     ],
 
     /*
