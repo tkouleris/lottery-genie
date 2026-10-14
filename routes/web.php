@@ -30,6 +30,12 @@ Route::get('/lotto', [DrawsController::class, 'draw_lotto'])->name('lotto');
 Route::get('/lotto/stats', [DrawsController::class, 'lotto_stats'])->name('lotto.stats');
 Route::get('/lotto/checker', [DrawsController::class, 'lotto_checker'])->name('lotto.checker');
 Route::get('/lotto/sum-checker', [DrawsController::class, 'lotto_sum_checker'])->name('lotto.sum-checker');
+Route::get('/lang/{locale}', function (string $locale) {
+    abort_unless(array_key_exists($locale, config('app.available_locales')), 404);
+    session(['locale' => $locale]);
+
+    return back();
+})->name('locale');
 Route::get('/about', function () {
     return view('about');
 })->name('about');

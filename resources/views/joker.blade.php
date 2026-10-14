@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Joker Numbers')
+@section('title', __(':game Numbers', ['game' => 'Joker']))
 
 @section('content')
     <header class="text-center mb-12">
-        <img src="{{ asset('img/tzoker.jpg') }}" alt="Joker Logo" class="mx-auto" style="max-height: 150px;">
-        <p class="text-slate-400 text-lg">Your lucky predictions for the next draw</p>
+        <img src="{{ asset('img/tzoker.jpg') }}" alt="{{ __(':game Logo', ['game' => 'Joker']) }}" class="mx-auto" style="max-height: 150px;">
+        <p class="text-slate-400 text-lg">{{ __('Your lucky predictions for the next draw') }}</p>
         <div class="mt-4">
             <a href="{{ route('joker.stats') }}" class="text-blue-400 hover:text-blue-300 font-semibold underline decoration-2 underline-offset-4 transition-colors">
-                View Historical Statistics
+                {{ __('View Historical Statistics') }}
             </a>
         </div>
     </header>
@@ -41,7 +41,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                         </svg>
-                        Check Combination
+                        {{ __('Check Combination') }}
                     </a>
                     <a href="{{ route('joker.sum-checker', ['numbers' => $draw['numbers']]) }}"
                        target="_blank"
@@ -49,7 +49,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
-                        Check Sum
+                        {{ __('Check Sum') }}
                     </a>
                 </div>
             </div>

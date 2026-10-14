@@ -28,7 +28,7 @@
                 Lottery Genie
             </div>
             <div class="flex flex-wrap justify-center gap-4 md:gap-6">
-                <a href="/" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">Home</a>
+                <a href="/" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">{{ __('Home') }}</a>
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" @click.away="open = false" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors flex items-center gap-1">
                         Eurojackpot
@@ -45,10 +45,10 @@
                          x-transition:leave-end="transform opacity-0 scale-95"
                          class="absolute w-40 bg-slate-800/90 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl z-50 top-full left-0 mt-2 py-2"
                          style="display: none;">
-                        <a href="{{ route('eurojackpot') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Predict</a>
-                        <a href="{{ route('eurojackpot.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Stats</a>
-                        <a href="{{ route('eurojackpot.checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Checker</a>
-                        <a href="{{ route('eurojackpot.sum-checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Sum Checker</a>
+                        <a href="{{ route('eurojackpot') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Predict') }}</a>
+                        <a href="{{ route('eurojackpot.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Stats') }}</a>
+                        <a href="{{ route('eurojackpot.checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Checker') }}</a>
+                        <a href="{{ route('eurojackpot.sum-checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Sum Checker') }}</a>
                     </div>
                 </div>
                 <div class="relative" x-data="{ open: false }">
@@ -67,10 +67,10 @@
                          x-transition:leave-end="transform opacity-0 scale-95"
                          class="absolute w-40 bg-slate-800/90 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl z-50 top-full left-0 mt-2 py-2"
                          style="display: none;">
-                        <a href="{{ route('joker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Predict</a>
-                        <a href="{{ route('joker.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Stats</a>
-                        <a href="{{ route('joker.checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Checker</a>
-                        <a href="{{ route('joker.sum-checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Sum Checker</a>
+                        <a href="{{ route('joker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Predict') }}</a>
+                        <a href="{{ route('joker.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Stats') }}</a>
+                        <a href="{{ route('joker.checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Checker') }}</a>
+                        <a href="{{ route('joker.sum-checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Sum Checker') }}</a>
                     </div>
                 </div>
                 <div class="relative" x-data="{ open: false }">
@@ -89,27 +89,32 @@
                          x-transition:leave-end="transform opacity-0 scale-95"
                          class="absolute w-40 bg-slate-800/90 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl z-50 top-full left-0 mt-2 py-2"
                          style="display: none;">
-                        <a href="{{ route('lotto') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Predict</a>
-                        <a href="{{ route('lotto.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Stats</a>
-                        <a href="{{ route('lotto.checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Checker</a>
-                        <a href="{{ route('lotto.sum-checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">Sum Checker</a>
+                        <a href="{{ route('lotto') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Predict') }}</a>
+                        <a href="{{ route('lotto.stats') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Stats') }}</a>
+                        <a href="{{ route('lotto.checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Checker') }}</a>
+                        <a href="{{ route('lotto.sum-checker') }}" class="block px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">{{ __('Sum Checker') }}</a>
                     </div>
                 </div>
-                <a href="{{ route('about') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">About</a>
+                <a href="{{ route('about') }}" class="text-sm md:text-base text-slate-300 hover:text-white transition-colors">{{ __('About') }}</a>
+                <div class="flex items-center gap-1 text-xs md:text-sm font-semibold">
+                    @foreach(config('app.available_locales') as $code => $label)
+                        <a href="{{ route('locale', $code) }}" hreflang="{{ $code }}" class="px-2 py-1 rounded-lg transition-colors {{ app()->getLocale() === $code ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white' }}">{{ $label }}</a>
+                    @endforeach
+                </div>
             </div>
         </div>
     </nav>
 
     <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm hidden">
         <div class="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-xl font-semibold text-white">Calculating luck...</p>
+        <p class="text-xl font-semibold text-white">{{ __('Calculating luck...') }}</p>
     </div>
 
     <div class="max-w-4xl w-full">
         @yield('content')
 
         <footer class="mt-16 text-center text-slate-500 text-sm">
-            <p>Calculated based on historical data. Good luck!</p>
+            <p>{{ __('Calculated based on historical data. Good luck!') }}</p>
             <p class="mt-2">&copy; {{ date('Y') }} Lottery Genie - <a href="https://tkouleris.eu/">Thodoris Kouleris</a></p>
         </footer>
     </div>

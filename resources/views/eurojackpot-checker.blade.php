@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Eurojackpot Combination Checker')
+@section('title', __(':game Combination Checker', ['game' => 'Eurojackpot']))
 
 @section('content')
     <header class="text-center mb-12">
-        <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto" style="max-height: 150px;">
-        <h1 class="text-3xl font-bold mt-4">Eurojackpot Combination Checker</h1>
-        <p class="text-slate-400 text-lg">Check if your numbers have ever won in the past</p>
+        <img src="{{ asset('img/eurojackpot.jpg') }}" alt="{{ __(':game Logo', ['game' => 'Eurojackpot']) }}" class="mx-auto" style="max-height: 150px;">
+        <h1 class="text-3xl font-bold mt-4">{{ __(':game Combination Checker', ['game' => 'Eurojackpot']) }}</h1>
+        <p class="text-slate-400 text-lg">{{ __('Check if your numbers have ever won in the past') }}</p>
     </header>
 
     <div x-data="checkerApp()" class="space-y-8">
@@ -16,7 +16,7 @@
                 @if($results)
                     <!-- Display Selected Numbers -->
                     <div class="text-center mb-8">
-                        <h3 class="text-xl font-semibold mb-6 text-slate-300">Your Combination</h3>
+                        <h3 class="text-xl font-semibold mb-6 text-slate-300">{{ __('Your Combination') }}</h3>
                         <div class="flex flex-wrap gap-4 justify-center">
                             @foreach($userNumbers as $n)
                                 <div class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-blue-500/20">
@@ -35,7 +35,7 @@
                     <div class="grid md:grid-cols-2 gap-8">
                         <!-- Main Numbers Selection -->
                         <div>
-                            <h3 class="text-xl font-semibold mb-4 text-blue-400">Main Numbers (Select 5)</h3>
+                            <h3 class="text-xl font-semibold mb-4 text-blue-400">{{ __('Main Numbers (Select :count)', ['count' => 5]) }}</h3>
                             <div class="grid grid-cols-10 gap-2">
                                 <template x-for="n in 50">
                                     <button type="button"
@@ -50,7 +50,7 @@
 
                         <!-- Eurozahlen Selection -->
                         <div>
-                            <h3 class="text-xl font-semibold mb-4 text-yellow-400">Eurozahlen (Select 2)</h3>
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-400">{{ __('Eurozahlen (Select :count)', ['count' => 2]) }}</h3>
                             <div class="grid grid-cols-6 gap-2">
                                 <template x-for="n in 12">
                                     <button type="button"
@@ -76,14 +76,14 @@
                 <div class="mt-8 flex flex-wrap gap-4 justify-center">
                     @if(!$results)
                         <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-500 hover:to-blue-300 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-all transform hover:scale-105">
-                            Check Combination
+                            {{ __('Check Combination') }}
                         </button>
                         <button type="button" @click="quickPick()" class="bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-full font-bold transition-all">
-                            Quick Pick / Randomize
+                            {{ __('Quick Pick / Randomize') }}
                         </button>
                     @endif
                     <button type="button" @click="reset()" class="text-slate-400 hover:text-white px-4 py-3 transition-colors {{ $results ? 'bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-full font-bold' : '' }}">
-                        {{ $results ? 'Check Another Combination' : 'Clear / Reset' }}
+                        {{ $results ? __('Check Another Combination') : __('Clear / Reset') }}
                     </button>
                 </div>
 
@@ -97,21 +97,21 @@
                 <!-- Exact Match Alert -->
                 @if($results['exact_matches'] > 0)
                     <div class="bg-green-500/20 border border-green-500 text-green-100 p-6 rounded-3xl text-center">
-                        <h2 class="text-2xl font-bold mb-2">🎉 JACKPOT MATCH! 🎉</h2>
-                        <p>This exact combination has been drawn <strong>{{ $results['exact_matches'] }}</strong> time(s) before!</p>
+                        <h2 class="text-2xl font-bold mb-2">🎉 {{ __('JACKPOT MATCH!') }} 🎉</h2>
+                        <p>{!! __('This exact combination has been drawn :count time(s) before!', ['count' => '<strong>' . e($results['exact_matches']) . '</strong>']) !!}</p>
                     </div>
                 @else
                     <div class="card-glass p-6 rounded-3xl text-center border border-slate-700">
-                        <p class="text-lg">This combination has never won a top tier prize in our historical dataset.</p>
+                        <p class="text-lg">{{ __('This combination has never won a top tier prize in our historical dataset.') }}</p>
                     </div>
                 @endif
 
                 <!-- Statistics Summary -->
                 <div class="grid md:grid-cols-1 gap-6">
                     <div class="card-glass p-6 rounded-3xl text-center">
-                        <h4 class="text-slate-400 text-sm uppercase mb-2">Total Draws Checked</h4>
+                        <h4 class="text-slate-400 text-sm uppercase mb-2">{{ __('Total Draws Checked') }}</h4>
                         <div class="text-3xl font-bold">{{ $results['total_draws'] }}</div>
-                        <p class="text-xs text-slate-500 mt-1">{{ $results['date_range']['start'] }} to {{ $results['date_range']['end'] }}</p>
+                        <p class="text-xs text-slate-500 mt-1">{{ __(':start to :end', ['start' => $results['date_range']['start'], 'end' => $results['date_range']['end']]) }}</p>
                     </div>
                 </div>
 
@@ -119,16 +119,16 @@
                 @if(count($results['match_history']) > 0)
                     <div class="card-glass rounded-3xl overflow-hidden">
                         <div class="p-6 border-b border-slate-700">
-                            <h3 class="text-xl font-bold">Historical Match Details</h3>
-                            <p class="text-sm text-slate-400">Showing draws with at least 3 total matches or major tiers</p>
+                            <h3 class="text-xl font-bold">{{ __('Historical Match Details') }}</h3>
+                            <p class="text-sm text-slate-400">{{ __('Showing draws with at least 3 total matches or major tiers') }}</p>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left">
                                 <thead class="bg-slate-800/50 text-slate-400 text-sm">
                                     <tr>
-                                        <th class="px-6 py-4">Draw Date</th>
-                                        <th class="px-6 py-4">Drawn Numbers & Eurozahlen</th>
-                                        <th class="px-6 py-4">Prize Tier</th>
+                                        <th class="px-6 py-4">{{ __('Draw Date') }}</th>
+                                        <th class="px-6 py-4">{{ __('Drawn Numbers & Eurozahlen') }}</th>
+                                        <th class="px-6 py-4">{{ __('Prize Tier') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-700">
@@ -226,7 +226,7 @@
 
                 validateForm(e) {
                     if (this.selectedNumbers.length !== 5 || this.selectedJokers.length !== 2) {
-                        this.error = 'Please select exactly 5 main numbers and 2 Eurozahlen.';
+                        this.error = @json(__('Please select exactly 5 main numbers and 2 Eurozahlen.'));
                     } else {
                         const overlay = document.getElementById('loading-overlay');
                         if (overlay) overlay.classList.remove('hidden');

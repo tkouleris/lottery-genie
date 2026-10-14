@@ -79,7 +79,7 @@ class DrawsController extends Controller
 
             // Ensure uniqueness
             if (count(array_unique($userNumbers)) !== 5 || count(array_unique($userJokers)) !== 2) {
-                return back()->withErrors('Numbers must be unique.');
+                return back()->withErrors(__('Numbers must be unique.'));
             }
 
             $results = $eurojackpotService->checkCombination($userNumbers, $userJokers);
@@ -146,7 +146,7 @@ class DrawsController extends Controller
 
             // Ensure uniqueness
             if (count(array_unique($userNumbers)) !== 5 || count(array_unique($userJokers)) !== 1) {
-                return back()->withErrors('Numbers must be unique.');
+                return back()->withErrors(__('Numbers must be unique.'));
             }
 
             $results = $jokerService->checkCombination($userNumbers, $userJokers);
@@ -168,7 +168,7 @@ class DrawsController extends Controller
 
             // Ensure uniqueness
             if (count(array_unique($userNumbers)) !== 6) {
-                return back()->withErrors('Numbers must be unique.');
+                return back()->withErrors(__('Numbers must be unique.'));
             }
 
             $results = $lottoService->checkCombination($userNumbers);

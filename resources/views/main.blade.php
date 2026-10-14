@@ -5,13 +5,13 @@
         <!-- Eurozahlen Section -->
         <div class="flex flex-col mb-8 md:mb-0">
             <header class="text-center mb-3">
-                <img src="{{ asset('img/eurojackpot.jpg') }}" alt="Eurojackpot Logo" class="mx-auto">
+                <img src="{{ asset('img/eurojackpot.jpg') }}" alt="{{ __(':game Logo', ['game' => 'Eurojackpot']) }}" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
-                    <div>Draw #{{ $euro['id'] }} • {{ $euro['date'] }}</div>
+                    <div>{{ __('Draw #:id • :date', ['id' => $euro['id'], 'date' => $euro['date']]) }}</div>
                     @if(\Carbon\Carbon::now()->format('d/m/Y') == $euro['next_draw_date'])
-                        <div>Next Draw:<b> Today</b> </div>
+                        <div>{{ __('Next Draw:') }} <b>{{ __('Today') }}</b></div>
                     @else
-                        <div>Next Draw: {{ $euro['next_draw_date'] }}</div>
+                        <div>{{ __('Next Draw:') }} {{ $euro['next_draw_date'] }}</div>
                     @endif
                 </div>
             </header>
@@ -39,13 +39,13 @@
         <!-- Joker Section -->
         <div class="flex flex-col mb-8 md:mb-0">
             <header class="text-center mb-3">
-                <img src="{{ asset('img/tzoker.jpg') }}" alt="Joker Logo" class="mx-auto">
+                <img src="{{ asset('img/tzoker.jpg') }}" alt="{{ __(':game Logo', ['game' => 'Joker']) }}" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
-                    <div>Draw #{{ $joker['id'] }} • {{ $joker['date'] }}</div>
+                    <div>{{ __('Draw #:id • :date', ['id' => $joker['id'], 'date' => $joker['date']]) }}</div>
                     @if(\Carbon\Carbon::now()->format('d/m/Y') == $joker['next_draw_date'])
-                        <div><b>Today</b></div>
+                        <div><b>{{ __('Today') }}</b></div>
                     @else
-                        <div>Next Draw: {{ $joker['next_draw_date'] }}</div>
+                        <div>{{ __('Next Draw:') }} {{ $joker['next_draw_date'] }}</div>
                     @endif
                 </div>
             </header>
@@ -73,13 +73,13 @@
         <!-- Lotto Section -->
         <div class="flex flex-col mb-8 md:mb-0">
             <header class="text-center mb-3">
-                <img src="{{ asset('img/lotto.jpg') }}" alt="Lotto Logo" class="mx-auto">
+                <img src="{{ asset('img/lotto.jpg') }}" alt="{{ __(':game Logo', ['game' => 'Lotto']) }}" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
-                    <div>Draw #{{ $lotto['id'] }} • {{ $lotto['date'] }}</div>
+                    <div>{{ __('Draw #:id • :date', ['id' => $lotto['id'], 'date' => $lotto['date']]) }}</div>
                     @if(\Carbon\Carbon::now()->format('d/m/Y') == $lotto['next_draw_date'])
-                        <div><b>Today</b></div>
+                        <div><b>{{ __('Today') }}</b></div>
                     @else
-                        <div>Next Draw: {{ $lotto['next_draw_date'] }}</div>
+                        <div>{{ __('Next Draw:') }} {{ $lotto['next_draw_date'] }}</div>
                     @endif
                 </div>
             </header>
@@ -100,7 +100,7 @@
     </div>
     <div class="mt-16 text-center max-w-2xl mx-auto">
         <p class="text-slate-400 text-base md:text-lg leading-relaxed px-4">
-            This application provides smart predictions for your favorite games Eurojackpot, Joker and Lotto, using statistics to help you choose your next lucky numbers.
+            {{ __('This application provides smart predictions for your favorite games Eurojackpot, Joker and Lotto, using statistics to help you choose your next lucky numbers.') }}
         </p>
     </div>
 @endsection
