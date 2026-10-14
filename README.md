@@ -50,7 +50,7 @@ The application processes historical draw data (stored in `storage/stats`) in `.
    ```
 
 5. **Prepare Statistics:**
-   Ensure your historical data Excel files are placed in the appropriate directories within `storage/stats/` (e.g., `storage/stats/lotto/`, `storage/stats/eurojackpot/`).
+   Ensure your historical data Excel files are placed in the appropriate directories within `storage/stats/` (`storage/stats/euro/`, `storage/stats/joker/`, `storage/stats/lotto/`), then run `php artisan app:cache-all`.
 
 ## Usage
 
@@ -62,10 +62,16 @@ Visit `http://localhost:8000` in your browser to access the Lottery Genie interf
 
 ### Console Commands
 
-You can also run statistics generation via the CLI:
+The statistics are read from the Excel files and cached for 7 days. Run these commands after adding new draw files so the site shows the latest data:
+
 ```bash
-php artisan app:euro
+php artisan app:cache-all           # cache Eurojackpot, Joker and Lotto
+php artisan app:cache-eurojackpot   # cache only Eurojackpot (storage/stats/euro)
+php artisan app:cache-joker         # cache only Joker (storage/stats/joker)
+php artisan app:cache-lotto         # cache only Lotto (storage/stats/lotto)
 ```
+
+`app:cache-all` runs each game in its own process, so the memory used to read one game's spreadsheets is freed before the next starts.
 
 ## Technologies Used
 

@@ -17,8 +17,6 @@ php artisan test --filter=ExampleTest  # single test
 ./vendor/bin/pint                      # code style
 ```
 
-The README's `php artisan app:euro` no longer exists; use the `app:cache-*` commands.
-
 Frontend has no build step in practice: the layout loads Tailwind (play CDN) and Alpine.js from CDNs, plus `public/css/style.css`. Vite is installed but unused by the views.
 
 ## Architecture
