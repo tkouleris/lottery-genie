@@ -4,6 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Lottery Genie')</title>
+    <meta name="description" content="@yield('description', __('Free statistics, number predictions and combination checkers for Eurojackpot, Joker and Lotto, based on historical draws.'))">
+    <meta name="keywords" content="@yield('keywords', __('lottery, statistics, predictions, Eurojackpot, Joker, Lotto, lottery numbers, frequent numbers, delays'))">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Lottery Genie">
+    <meta property="og:title" content="@yield('title', 'Lottery Genie')">
+    <meta property="og:description" content="@yield('description', __('Free statistics, number predictions and combination checkers for Eurojackpot, Joker and Lotto, based on historical draws.'))">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:locale" content="{{ app()->getLocale() === 'el' ? 'el_GR' : 'en_US' }}">
+    <link rel="canonical" href="{{ url()->current() }}">
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon-32.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/apple-touch-icon.png') }}">

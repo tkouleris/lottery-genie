@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', __(':game Sum Checker', ['game' => $game['name']]))
+@section('description', __('Check how the sum of your :game numbers compares with the sums of historical draws.', ['game' => $game['name']]))
+@section('keywords', __(':game sum checker, :game number sum, sum distribution, lottery sum', ['game' => $game['name']]))
 
 @section('content')
     <header class="text-center mb-12">

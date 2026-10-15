@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', __(':game Combination Checker', ['game' => 'Eurojackpot']))
+@section('description', __('Check if your :game combination has ever won in past draws and how many numbers it matched.', ['game' => 'Eurojackpot']))
+@section('keywords', __(':game checker, :game combination, :game past results, lottery number checker', ['game' => 'Eurojackpot']))
 
 @section('content')
     <header class="text-center mb-12">

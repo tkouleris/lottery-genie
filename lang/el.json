@@ -137,5 +137,18 @@
     "Acceptable, but sums in this range are drawn less often.": "Αποδεκτό, αλλά αθροίσματα σε αυτό το εύρος κληρώνονται λιγότερο συχνά.",
     "Extreme / Low Probability": "Ακραίο / Χαμηλή Πιθανότητα",
     "The sum is too low. Consider adding higher numbers.": "Το άθροισμα είναι πολύ χαμηλό. Σκεφτείτε να προσθέσετε μεγαλύτερους αριθμούς.",
-    "The sum is too high. Consider adding lower numbers.": "Το άθροισμα είναι πολύ υψηλό. Σκεφτείτε να προσθέσετε μικρότερους αριθμούς."
+    "The sum is too high. Consider adding lower numbers.": "Το άθροισμα είναι πολύ υψηλό. Σκεφτείτε να προσθέσετε μικρότερους αριθμούς.",
+
+    "Free statistics, number predictions and combination checkers for Eurojackpot, Joker and Lotto, based on historical draws.": "Δωρεάν στατιστικά, προβλέψεις αριθμών και έλεγχος συνδυασμών για Eurojackpot, Τζόκερ και Λόττο, με βάση τις ιστορικές κληρώσεις.",
+    "lottery, statistics, predictions, Eurojackpot, Joker, Lotto, lottery numbers, frequent numbers, delays": "λοταρία, στατιστικά, προβλέψεις, Eurojackpot, Τζόκερ, Joker, Λόττο, Lotto, αριθμοί κλήρωσης, συχνότεροι αριθμοί, καθυστερήσεις",
+    ":game number predictions for the next draw, generated from the frequency of numbers in historical draws.": "Προβλέψεις αριθμών :game για την επόμενη κλήρωση, βασισμένες στη συχνότητα των αριθμών στις ιστορικές κληρώσεις.",
+    ":game predictions, :game numbers, :game next draw, lottery predictions": "προβλέψεις :game, αριθμοί :game, επόμενη κλήρωση :game, προβλέψεις λοταρίας",
+    ":game statistics: most frequent numbers, delays, even/odd, sum and range distributions and common triplets from historical draws.": "Στατιστικά :game: συχνότεροι αριθμοί, καθυστερήσεις, μονά/ζυγά, κατανομές αθροίσματος και εύρους και συχνές τριάδες από τις ιστορικές κληρώσεις.",
+    ":game statistics, :game frequent numbers, :game delays, :game results, lottery statistics": "στατιστικά :game, συχνότεροι αριθμοί :game, καθυστερήσεις :game, αποτελέσματα :game, στατιστικά λοταρίας",
+    "Check if your :game combination has ever won in past draws and how many numbers it matched.": "Ελέγξτε αν ο συνδυασμός σας στο :game έχει κερδίσει ποτέ σε παλαιότερες κληρώσεις και πόσους αριθμούς πέτυχε.",
+    ":game checker, :game combination, :game past results, lottery number checker": "έλεγχος :game, συνδυασμός :game, παλαιότερα αποτελέσματα :game, έλεγχος αριθμών λοταρίας",
+    "Check how the sum of your :game numbers compares with the sums of historical draws.": "Δείτε πώς συγκρίνεται το άθροισμα των αριθμών σας στο :game με τα αθροίσματα των ιστορικών κληρώσεων.",
+    ":game sum checker, :game number sum, sum distribution, lottery sum": "έλεγχος αθροίσματος :game, άθροισμα αριθμών :game, κατανομή αθροίσματος, άθροισμα λοταρίας",
+    "Learn how Lottery Genie analyses historical Eurojackpot, Joker and Lotto draws to produce statistics and predictions.": "Μάθετε πώς το Lottery Genie αναλύει τις ιστορικές κληρώσεις Eurojackpot, Τζόκερ και Λόττο για να παράγει στατιστικά και προβλέψεις.",
+    "about Lottery Genie, lottery statistics, lottery predictions, Eurojackpot, Joker, Lotto": "σχετικά με το Lottery Genie, στατιστικά λοταρίας, προβλέψεις λοταρίας, Eurojackpot, Τζόκερ, Λόττο"
 }

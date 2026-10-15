@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', __('About - Lottery Genie'))
+@section('description', __('Learn how Lottery Genie analyses historical Eurojackpot, Joker and Lotto draws to produce statistics and predictions.'))
+@section('keywords', __('about Lottery Genie, lottery statistics, lottery predictions, Eurojackpot, Joker, Lotto'))
 
 @section('content')
     <header class="text-center mb-12">

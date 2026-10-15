@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', __(':game Numbers', ['game' => 'Joker']))
+@section('description', __(':game number predictions for the next draw, generated from the frequency of numbers in historical draws.', ['game' => 'Joker']))
+@section('keywords', __(':game predictions, :game numbers, :game next draw, lottery predictions', ['game' => 'Joker']))
 
 @section('content')
     <header class="text-center mb-12">

@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', __(':game Statistics', ['game' => 'Joker']))
+@section('description', __(':game statistics: most frequent numbers, delays, even/odd, sum and range distributions and common triplets from historical draws.', ['game' => 'Joker']))
+@section('keywords', __(':game statistics, :game frequent numbers, :game delays, :game results, lottery statistics', ['game' => 'Joker']))
 
 @section('content')
     <header class="text-center mb-12">
