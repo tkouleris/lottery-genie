@@ -17,7 +17,9 @@ class JokerService
      * Joker draws 5 main numbers of 45 and 1 joker number of 20
      */
     private const PICK = 5;
+
     private const MAX_NUMBER = 45;
+
     private const MAX_JOKER = 20;
 
     private const FOLDER = 'stats/joker';
@@ -26,8 +28,11 @@ class JokerService
      * Cache keys filled by the app:cache-joker command
      */
     private const CACHE_DRAWS = 'joker_draws';
+
     private const CACHE_STATS = 'joker_stats';
+
     private const CACHE_DELAYS = 'joker_delays';
+
     private const CACHE_LATEST_DRAW_DATE = 'joker_latest_draw_date';
 
     /**
@@ -36,8 +41,6 @@ class JokerService
     private array $loadedFiles = [];
 
     /**
-     * @param string $folder
-     * @return array
      * @throws FileNotFoundException
      * @throws Exception
      */
@@ -47,7 +50,7 @@ class JokerService
         $delays = $this->cachedOrLoaded(self::CACHE_DELAYS, 'delays', $folder);
 
         if (empty($draws)) {
-            throw new Exception("No data found in " . storage_path($folder));
+            throw new Exception('No data found in '.storage_path($folder));
         }
 
         return $this->calculateStatistics($draws, $delays, $folder);
@@ -72,7 +75,7 @@ class JokerService
             }
 
             // 3. Even / Odd frequency (for the 5 numbers)
-            $evenCount = count(array_filter($numbers, fn($num) => $num % 2 === 0));
+            $evenCount = count(array_filter($numbers, fn ($num) => $num % 2 === 0));
             $oddCount = count($numbers) - $evenCount;
             $evenOddKey = "{$evenCount} even / {$oddCount} odd";
             $even_odd_freq[$evenOddKey] = ($even_odd_freq[$evenOddKey] ?? 0) + 1;
@@ -88,8 +91,8 @@ class JokerService
             'even_odd_stats' => $even_odd_freq,
             'sum_distribution' => $this->sumDistribution()->calculate($delays),
             'range_distribution' => $this->numberRangeDistribution()->calculate($delays->pluck('numbers')),
-            'number_delay' => $this->delays($delays, fn($draw) => $draw['numbers'], self::MAX_NUMBER),
-            'joker_delay' => $this->delays($delays, fn($draw) => [$draw['joker']], self::MAX_JOKER),
+            'number_delay' => $this->delays($delays, fn ($draw) => $draw['numbers'], self::MAX_NUMBER),
+            'joker_delay' => $this->delays($delays, fn ($draw) => [$draw['joker']], self::MAX_JOKER),
             'total_draws_analyzed' => count($draws),
             'latest_draw_date' => File::get_latest_file_date($folder),
         ];
@@ -98,9 +101,9 @@ class JokerService
     /**
      * Number of draws since each number was last drawn
      *
-     * @param Collection $delays draws sorted from newest to oldest
-     * @param callable $numbersOf returns the numbers of a draw to track
-     * @param int $maxNumber highest tracked number
+     * @param  Collection  $delays  draws sorted from newest to oldest
+     * @param  callable  $numbersOf  returns the numbers of a draw to track
+     * @param  int  $maxNumber  highest tracked number
      * @return array<int, int> number => delay, the total draws for numbers never drawn
      */
     private function delays(Collection $delays, callable $numbersOf, int $maxNumber): array
@@ -115,13 +118,14 @@ class JokerService
             }
         }
 
-        return array_map(fn($value) => $value ?? $delays->count(), $delay);
+        return array_map(fn ($value) => $value ?? $delays->count(), $delay);
     }
 
     /**
      * Picks the most frequent numbers out of 100 random draws weighted by the draw history
      *
      * @return array[]
+     *
      * @throws FileNotFoundException
      * @throws Exception
      */
@@ -130,7 +134,7 @@ class JokerService
         $draws = $this->cachedOrLoaded(self::CACHE_DRAWS, 'draws', $folder);
 
         if (empty($draws)) {
-            throw new Exception("No data found in " . storage_path($folder));
+            throw new Exception('No data found in '.storage_path($folder));
         }
 
         // Every drawn number appears once per draw, so a random pick is weighted by its frequency
@@ -146,9 +150,11 @@ class JokerService
         $numberCounts = array_fill(1, self::MAX_NUMBER, 0);
         $jokerCounts = array_fill(1, self::MAX_JOKER, 0);
         for ($i = 0; $i < 100; $i++) {
+            shuffle($numberPool);
             foreach ($this->pickDistinct($numberPool, self::PICK) as $num) {
                 $numberCounts[$num]++;
             }
+            shuffle($jokerPool);
             $jokerCounts[$jokerPool[array_rand($jokerPool)]]++;
         }
 
@@ -197,8 +203,7 @@ class JokerService
 
     /**
      * loading joker draws data from xlsx files
-     * @param string $folder
-     * @return array
+     *
      * @throws FileNotFoundException
      */
     public function load_files(string $folder = self::FOLDER): array
@@ -246,13 +251,13 @@ class JokerService
                     $stats[] = [
                         'date' => $row[1],
                         'numbers' => $numbers,
-                        'joker' => $joker
+                        'joker' => $joker,
                     ];
 
                     $delays[] = [
                         'date' => $date,
                         'numbers' => $numbers,
-                        'joker' => $joker
+                        'joker' => $joker,
                     ];
 
                     if (is_null($lastDrawDate) || $lastDrawDate->lt($date)) {
@@ -261,18 +266,20 @@ class JokerService
                     }
                 }
             } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
+                Log::error("Error reading file {$file}: ".$e->getMessage());
             }
         }
         $delays = collect($delays)
-            ->sortByDesc(fn($delay) => $delay['date'])
+            ->sortByDesc(fn ($delay) => $delay['date'])
             ->values();
+
         return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
     }
 
     /**
-     * @param string $cacheKey cache key filled by the app:cache-joker command
-     * @param string $outputKey matching load_files() output key, used on a cache miss
+     * @param  string  $cacheKey  cache key filled by the app:cache-joker command
+     * @param  string  $outputKey  matching load_files() output key, used on a cache miss
+     *
      * @throws FileNotFoundException
      */
     private function cachedOrLoaded(string $cacheKey, string $outputKey, string $folder): mixed
@@ -305,9 +312,9 @@ class JokerService
             'match_history' => [],
             'total_draws' => count($history),
             'date_range' => [
-                'start' => !empty($history) ? end($history)['date'] : null,
-                'end' => !empty($history) ? $history[0]['date'] : null,
-            ]
+                'start' => ! empty($history) ? end($history)['date'] : null,
+                'end' => ! empty($history) ? $history[0]['date'] : null,
+            ],
         ];
 
         foreach ($history as $draw) {
@@ -334,7 +341,7 @@ class JokerService
                     'jokers' => $drawJoker,
                     'matching_numbers' => $matchingNumbers,
                     'matching_jokers' => $matchingJokers,
-                    'tier' => $tier
+                    'tier' => $tier,
                 ];
             }
         }
@@ -343,8 +350,6 @@ class JokerService
     }
 
     /**
-     * @param string $folder
-     * @return array
      * @throws FileNotFoundException
      */
     public function getSumDistribution(string $folder = self::FOLDER): array
@@ -385,11 +390,12 @@ class JokerService
     private function getNextDrawDate(): string
     {
         $now = Carbon::now()->subDays(1);
+
         return collect([
             Carbon::SUNDAY,
             Carbon::TUESDAY,
             Carbon::THURSDAY,
-        ])->map(fn($day) => $now->copy()->next($day))
+        ])->map(fn ($day) => $now->copy()->next($day))
             ->sort()
             ->first()
             ->format('d/m/Y');

@@ -14,12 +14,13 @@ class EurojackpotService
 {
     /**
      * @return array[]
+     *
      * @throws FileNotFoundException
      */
     public function run($folder = 'stats/euro'): array
     {
         $finalStatistics = Cache::get('eurojackpot_draws');
-        if(is_null($finalStatistics)){
+        if (is_null($finalStatistics)) {
             $output = $this->load_files();
             $finalStatistics = $output['stats'];
         }
@@ -51,14 +52,13 @@ class EurojackpotService
 
             $tmpJokerDraw = array_slice($draw, 5, 2);
             if (count($tmpJokerDraw) === 2) {
-                $jokerEvens = count(array_filter($tmpJokerDraw, fn($n) => $n % 2 === 0));
+                $jokerEvens = count(array_filter($tmpJokerDraw, fn ($n) => $n % 2 === 0));
                 $jokerEven[$jokerEvens]++;
 
                 $drawJokerSum = array_sum($tmpJokerDraw);
                 $jokerSums[$drawJokerSum] = ($jokerSums[$drawJokerSum] ?? 0) + 1;
             }
         }
-
 
         $jokerStats = [];
         foreach ($joker as $key => $value) {
@@ -73,19 +73,20 @@ class EurojackpotService
         shuffle($stats);
 
         arsort($jokerSums);
-        $allowedJokerSums = array_slice(array_keys($jokerSums), 0, (int)(count($jokerSums) / 2));
+        $allowedJokerSums = array_slice(array_keys($jokerSums), 0, (int) (count($jokerSums) / 2));
         $draws = [];
         for ($i = 0; $i < 100; $i++) {
             $draw = [
                 'numbers' => [],
-                'joker' => []
+                'joker' => [],
             ];
+            shuffle($stats);
 
             while (count($draw['numbers']) === 0) {
                 $currentNumbers = [];
                 while (count($currentNumbers) < 5) {
                     $val = $stats[array_rand($stats)];
-                    if (!in_array($val, $currentNumbers)) {
+                    if (! in_array($val, $currentNumbers)) {
                         $currentNumbers[] = $val;
                     }
                 }
@@ -93,18 +94,18 @@ class EurojackpotService
 
                 $draw['numbers'] = $currentNumbers;
             }
-
+            shuffle($jokerStats);
             while (count($draw['joker']) === 0) {
                 $currentJokers = [];
                 while (count($currentJokers) < 2) {
                     $val = $jokerStats[array_rand($jokerStats)];
-                    if (!in_array($val, $currentJokers)) {
+                    if (! in_array($val, $currentJokers)) {
                         $currentJokers[] = $val;
                     }
                 }
                 sort($currentJokers);
 
-                if (!in_array(array_sum($currentJokers), $allowedJokerSums)) {
+                if (! in_array(array_sum($currentJokers), $allowedJokerSums)) {
                     continue;
                 }
 
@@ -133,9 +134,9 @@ class EurojackpotService
 
         arsort($statisticsJoker);
         $topJokers = array_slice(array_keys($statisticsJoker), 0, 4);
+        shuffle($topJokers);
         $finalJokers = array_slice($topJokers, 0, 2);
         sort($finalJokers);
-
 
         return [
             'numbers' => $finalNumbers,
@@ -144,8 +145,6 @@ class EurojackpotService
     }
 
     /**
-     * @param string $folder
-     * @return array
      * @throws FileNotFoundException
      */
     public function get_stats(string $folder = 'stats/euro'): array
@@ -159,7 +158,7 @@ class EurojackpotService
         }
 
         if (empty($allDraws)) {
-            throw new Exception("No data found for statistics.");
+            throw new Exception('No data found for statistics.');
         }
 
         // The draws are loaded in chronological order (oldest to newest)
@@ -182,7 +181,7 @@ class EurojackpotService
                 if (isset($numbers[$i]) && $numbers[$i] >= 1 && $numbers[$i] <= 50) {
                     $num = $numbers[$i];
 
-                    if (!$numbersFound[$num]) {
+                    if (! $numbersFound[$num]) {
                         $numberDelay[$num] = $drawIndex;
                         $numbersFound[$num] = true;
                     }
@@ -192,7 +191,7 @@ class EurojackpotService
             for ($i = 0; $i <= 1; $i++) {
                 if (isset($jokers[$i]) && $jokers[$i] >= 1 && $jokers[$i] <= 12) {
                     $jokerNum = $jokers[$i];
-                    if (!$jokersFound[$jokerNum]) {
+                    if (! $jokersFound[$jokerNum]) {
                         $jokerDelay[$jokerNum] = $drawIndex;
                         $jokersFound[$jokerNum] = true;
                     }
@@ -233,7 +232,7 @@ class EurojackpotService
             if (count($jokers) === 2) {
                 sort($jokers);
                 $pair = implode('-', $jokers);
-                if (!isset($jokerPairsFrequency[$pair])) {
+                if (! isset($jokerPairsFrequency[$pair])) {
                     $jokerPairsFrequency[$pair] = 0;
                 }
                 $jokerPairsFrequency[$pair]++;
@@ -242,12 +241,12 @@ class EurojackpotService
 
         // For numbers not found in history, delay is equal to total draws
         foreach ($numbersFound as $num => $found) {
-            if (!$found) {
+            if (! $found) {
                 $numberDelay[$num] = count($allDraws);
             }
         }
         foreach ($jokersFound as $num => $found) {
-            if (!$found) {
+            if (! $found) {
                 $jokerDelay[$num] = count($allDraws);
             }
         }
@@ -275,19 +274,17 @@ class EurojackpotService
     }
 
     /**
-     * @param string $folder
-     * @return array
      * @throws FileNotFoundException
      */
     public function getLatestDrawDate(string $folder = 'stats/euro'): array
     {
         $out = Cache::get('eurojackpot_latest_draw_date');
-        if($out) {
+        if ($out) {
             return $out;
         }
         $lastDraw = $this->load_files($folder)['lastDraw'];
 
-        if(count($lastDraw) ==0) {
+        if (count($lastDraw) == 0) {
             return [];
         }
 
@@ -295,15 +292,14 @@ class EurojackpotService
             'id' => $lastDraw[0],
             'date' => $lastDraw[1],
             'numbers' => [$lastDraw[2], $lastDraw[3], $lastDraw[4], $lastDraw[5], $lastDraw[6]],
-            'joker' => [$lastDraw[7],$lastDraw[8]],
+            'joker' => [$lastDraw[7], $lastDraw[8]],
             'next_draw_date' => $this->getNextDrawDate(),
         ];
     }
 
     /**
      * loading eurojackpot draws data from xlsx files
-     * @param string $folder
-     * @return array
+     *
      * @throws FileNotFoundException
      */
     public function load_files(string $folder = 'stats/euro'): array
@@ -324,7 +320,7 @@ class EurojackpotService
                 foreach ($rows as $index => $row) {
 
                     // Skip header rows (first 3 rows) and non-numeric rows
-                    if ($index < 3 ) {
+                    if ($index < 3) {
                         continue;
                     }
 
@@ -334,7 +330,7 @@ class EurojackpotService
                     $drawData = [];
                     for ($i = 2; $i <= 8; $i++) {
                         if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawData[] = (int)$row[$i];
+                            $drawData[] = (int) $row[$i];
                         }
                     }
 
@@ -342,25 +338,25 @@ class EurojackpotService
                         $finalStatistics[] = $drawData;
                     }
 
-                    if(count($lastDraw) ==0) {
+                    if (count($lastDraw) == 0) {
                         $lastDraw = $row;
                     }
                     $previous_date = Carbon::createFromFormat('d/m/Y', $lastDraw[1]);
                     $current_date = Carbon::createFromFormat('d/m/Y', $row[1]);
-                    if($previous_date->lt($current_date)) {
+                    if ($previous_date->lt($current_date)) {
                         $lastDraw = $row;
                     }
 
                     $drawNumbers = [];
                     for ($i = 2; $i <= 6; $i++) {
                         if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawNumbers[] = (int)$row[$i];
+                            $drawNumbers[] = (int) $row[$i];
                         }
                     }
                     $drawJokers = [];
                     for ($i = 7; $i <= 8; $i++) {
                         if (isset($row[$i]) && is_numeric($row[$i])) {
-                            $drawJokers[] = (int)$row[$i];
+                            $drawJokers[] = (int) $row[$i];
                         }
                     }
 
@@ -368,34 +364,34 @@ class EurojackpotService
                         $history[] = [
                             'date' => $row[1],
                             'numbers' => $drawNumbers,
-                            'jokers' => $drawJokers
+                            'jokers' => $drawJokers,
                         ];
                         $delays[] = [
                             'date' => Carbon::createFromFormat('d/m/Y', $row[1]),
                             'numbers' => $drawNumbers,
-                            'jokers' => $drawJokers
+                            'jokers' => $drawJokers,
                         ];
                     }
                 }
             } catch (Exception $e) {
-                Log::error("Error reading file {$file}: " . $e->getMessage());
+                Log::error("Error reading file {$file}: ".$e->getMessage());
             }
         }
         $delays = collect($delays)
             ->sortByDesc(fn ($delay) => Carbon::parse($delay['date']))
             ->values();
+
         return ['stats' => $finalStatistics, 'lastDraw' => $lastDraw, 'history' => $history, 'delays' => $delays];
     }
 
     /**
-     * @param array $userNumbers 5 main numbers
-     * @param array $userJokers 2 Eurozahlen
-     * @return array
+     * @param  array  $userNumbers  5 main numbers
+     * @param  array  $userJokers  2 Eurozahlen
      */
     public function checkCombination(array $userNumbers, array $userJokers): array
     {
         $history = Cache::get('eurojackpot_history');
-        if(is_null($history)) {
+        if (is_null($history)) {
             $output = $this->load_files();
             $history = $output['history'];
         }
@@ -409,9 +405,9 @@ class EurojackpotService
             'match_history' => [],
             'total_draws' => count($history),
             'date_range' => [
-                'start' => !empty($history) ? end($history)['date'] : null,
-                'end' => !empty($history) ? $history[0]['date'] : null,
-            ]
+                'start' => ! empty($history) ? end($history)['date'] : null,
+                'end' => ! empty($history) ? $history[0]['date'] : null,
+            ],
         ];
 
         foreach ($history as $draw) {
@@ -435,7 +431,7 @@ class EurojackpotService
                     'jokers' => $draw['jokers'],
                     'matching_numbers' => $matchingNumbers,
                     'matching_jokers' => $matchingJokers,
-                    'tier' => $tier
+                    'tier' => $tier,
                 ];
             }
         }
@@ -444,8 +440,6 @@ class EurojackpotService
     }
 
     /**
-     * @param string $folder
-     * @return array
      * @throws FileNotFoundException
      */
     public function getSumDistribution(string $folder = 'stats/euro'): array
@@ -491,6 +485,7 @@ class EurojackpotService
     private function getNextDrawDate()
     {
         $now = Carbon::now()->subDays(1);
+
         return collect([
             Carbon::FRIDAY,
             Carbon::TUESDAY,
@@ -499,6 +494,4 @@ class EurojackpotService
             ->first()
             ->format('d/m/Y');
     }
-
-
 }
