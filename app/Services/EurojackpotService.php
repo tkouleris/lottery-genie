@@ -24,6 +24,8 @@ class EurojackpotService
 
     private const MAX_JOKER = 12;
 
+    private const DRAW_DAYS = [Carbon::TUESDAY, Carbon::FRIDAY];
+
     private const FOLDER = 'stats/euro';
 
     /**
@@ -276,13 +278,20 @@ class EurojackpotService
                         continue;
                     }
 
+                    $date = $this->parseDrawDate((string) $row[1]);
+                    if (is_null($date)) {
+                        Log::warning("Skipping Eurojackpot draw {$row[0]} in {$file}: invalid date '{$row[1]}'");
+
+                        continue;
+                    }
+                    $row[1] = $date->format('d/m/Y');
+
                     $finalStatistics[] = $drawData;
 
                     $numbers = array_slice($drawData, 0, self::PICK);
                     sort($numbers);
                     $jokers = array_slice($drawData, self::PICK, self::JOKER_PICK);
                     sort($jokers);
-                    $date = Carbon::createFromFormat('d/m/Y', $row[1]);
 
                     $history[] = [
                         'date' => $date,
@@ -313,7 +322,37 @@ class EurojackpotService
         $delays = $history
             ->map(fn ($draw) => ['date' => $draw['date'], 'numbers' => $draw['numbers'], 'jokers' => $draw['jokers']]);
 
-        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
+        return $this->loadedFiles[$folder] = ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
+    }
+
+    /**
+     * Parses a d/m/Y draw date, fixing the dates some sheets write as m/d/Y (e.g. 10/25/2024)
+     *
+     * A draw takes place on a Tuesday or Friday, so the reading that falls on a draw day wins.
+     * When neither does, the d/m/Y reading is kept.
+     */
+    private function parseDrawDate(string $value): ?Carbon
+    {
+        [$first, $second, $year] = array_map('intval', explode('/', $value)) + [0, 0, 0];
+
+        $candidates = [];
+        foreach ([[$first, $second], [$second, $first]] as [$day, $month]) {
+            if (checkdate($month, $day, $year)) {
+                $candidates[] = Carbon::create($year, $month, $day);
+            }
+        }
+
+        foreach ($candidates as $date) {
+            if (in_array($date->dayOfWeek, self::DRAW_DAYS)) {
+                if ($date->day !== $first) {
+                    Log::warning("Eurojackpot date '{$value}' read as month/day: {$date->format('d/m/Y')}");
+                }
+
+                return $date;
+            }
+        }
+
+        return $candidates[0] ?? null;
     }
 
     /**
