@@ -17,7 +17,7 @@ php artisan test --filter=ExampleTest  # single test
 ./vendor/bin/pint                      # code style
 ```
 
-Frontend has no build step in practice: the layout loads Tailwind (play CDN) and Alpine.js from CDNs, plus `public/css/style.css`. Vite is installed but unused by the views.
+Frontend has no build step: the layout loads Tailwind (play CDN) and Alpine.js from CDNs, plus `public/css/style.css`. There is no npm/Vite toolchain.
 
 ## Architecture
 
