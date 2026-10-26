@@ -21,37 +21,35 @@ class CacheEurojackpot extends Command
      *
      * @var string
      */
-    protected $description = 'Load Eurojackpot draw files and cache their stats, history, number delays and latest draw date';
+    protected $description = 'Load Eurojackpot draw files and cache their draws, stats, number delays and latest draw date';
 
     /**
      * Execute the console command.
+     *
      * @throws FileNotFoundException
      */
     public function handle()
     {
+        $folder = 'stats/euro';
         $obj = resolve(EurojackpotService::class);
+        $output = $obj->load_files($folder);
 
         Cache::forget('eurojackpot_draws');
-        $output = $obj->load_files();
-        $finalStatistics = $output['stats'];
+        $finalStatistics = $output['draws'];
         Cache::put('eurojackpot_draws', $finalStatistics, now()->addDays(7));
 
-
         Cache::forget('eurojackpot_stats');
-        $allDraws = $finalStatistics;
-        Cache::put('eurojackpot_stats', $allDraws, now()->addDays(7));
-
-        Cache::forget('eurojackpot_history');
-        $history = $output['history'];
-        Cache::put('eurojackpot_history', $history, now()->addDays(7));
+        $stats = $output['stats'];
+        Cache::put('eurojackpot_stats', $stats, now()->addDays(7));
 
         Cache::forget('eurojackpot_delays');
         $delays = $output['delays'];
         Cache::put('eurojackpot_delays', $delays, now()->addDays(7));
 
+        // Replaced by eurojackpot_stats
+        Cache::forget('eurojackpot_history');
 
         Cache::forget('eurojackpot_latest_draw_date');
-        $obj = resolve(EurojackpotService::class);
         $latest_draw = $obj->getLatestDrawDate();
         Cache::put('eurojackpot_latest_draw_date', $latest_draw, now()->addDays(7));
     }
