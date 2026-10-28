@@ -14,6 +14,9 @@
                     @else
                         <div>{{ __('Next Draw:') }} {{ $euro['next_draw_date'] }}</div>
                     @endif
+                    @isset($jackpots['euro'])
+                        <div>{{ __('Jackpot:') }} <b class="text-yellow-400">{{ number_format($jackpots['euro']['amount'], 0, ',', '.') }} €</b></div>
+                    @endisset
                     <button type="button" @click="prizesOpen = true"
                         class="mt-2 text-sm text-blue-400 hover:text-blue-300 underline underline-offset-4">{{ __('Winners & prizes') }}</button>
                 </div>
@@ -54,6 +57,9 @@
                     @else
                         <div>{{ __('Next Draw:') }} {{ $joker['next_draw_date'] }}</div>
                     @endif
+                    @isset($jackpots['joker'])
+                        <div>{{ __('Jackpot:') }} <b class="text-yellow-400">{{ number_format($jackpots['joker']['amount'], 0, ',', '.') }} €</b></div>
+                    @endisset
                     <button type="button" @click="prizesOpen = true"
                         class="mt-2 text-sm text-blue-400 hover:text-blue-300 underline underline-offset-4">{{ __('Winners & prizes') }}</button>
                 </div>
@@ -94,6 +100,9 @@
                     @else
                         <div>{{ __('Next Draw:') }} {{ $lotto['next_draw_date'] }}</div>
                     @endif
+                    @isset($jackpots['lotto'])
+                        <div>{{ __('Jackpot:') }} <b class="text-yellow-400">{{ number_format($jackpots['lotto']['amount'], 0, ',', '.') }} €</b></div>
+                    @endisset
                     <button type="button" @click="prizesOpen = true"
                         class="mt-2 text-sm text-blue-400 hover:text-blue-300 underline underline-offset-4">{{ __('Winners & prizes') }}</button>
                 </div>

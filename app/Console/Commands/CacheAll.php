@@ -19,7 +19,7 @@ class CacheAll extends Command
      *
      * @var string
      */
-    protected $description = 'Cache Eurojackpot, Joker and Lotto statistics';
+    protected $description = 'Cache Eurojackpot, Joker and Lotto statistics and next draw jackpots';
 
     /**
      * Execute the console command.
@@ -33,6 +33,7 @@ class CacheAll extends Command
             'Eurojackpot' => 'app:cache-eurojackpot',
             'Joker' => 'app:cache-joker',
             'Lotto' => 'app:cache-lotto',
+            'Jackpots' => 'app:cache-jackpots',
         ];
 
         $failed = false;
