@@ -150,5 +150,16 @@
     "Check how the sum of your :game numbers compares with the sums of historical draws.": "Δείτε πώς συγκρίνεται το άθροισμα των αριθμών σας στο :game με τα αθροίσματα των ιστορικών κληρώσεων.",
     ":game sum checker, :game number sum, sum distribution, lottery sum": "έλεγχος αθροίσματος :game, άθροισμα αριθμών :game, κατανομή αθροίσματος, άθροισμα λοταρίας",
     "Learn how Lottery Genie analyses historical Eurojackpot, Joker and Lotto draws to produce statistics and predictions.": "Μάθετε πώς το Lottery Genie αναλύει τις ιστορικές κληρώσεις Eurojackpot, Τζόκερ και Λόττο για να παράγει στατιστικά και προβλέψεις.",
-    "about Lottery Genie, lottery statistics, lottery predictions, Eurojackpot, Joker, Lotto": "σχετικά με το Lottery Genie, στατιστικά λοταρίας, προβλέψεις λοταρίας, Eurojackpot, Τζόκερ, Λόττο"
+    "about Lottery Genie, lottery statistics, lottery predictions, Eurojackpot, Joker, Lotto": "σχετικά με το Lottery Genie, στατιστικά λοταρίας, προβλέψεις λοταρίας, Eurojackpot, Τζόκερ, Λόττο",
+    "Winners & prizes": "Νικητές & κέρδη",
+    ":game winners & prizes": "Νικητές & κέρδη :game",
+    "Category": "Κατηγορία",
+    "Winners": "Επιτυχίες",
+    "In Greece": "Στην Ελλάδα",
+    "Prize": "Κέρδη",
+    "Jackpot": "Τζακ-ποτ",
+    "Close": "Κλείσιμο",
+    "No prize data for this draw.": "Δεν υπάρχουν στοιχεία κερδών για αυτή την κλήρωση.",
+    "Prize per winning ticket. \"Jackpot\" means nobody won the top tier and the prize rolls over.": "Κέρδη ανά επιτυχημένη στήλη. «Τζακ-ποτ» σημαίνει ότι δεν υπήρξε νικητής στην πρώτη κατηγορία και το ποσό μεταφέρεται."
+
 }

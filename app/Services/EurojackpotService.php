@@ -224,7 +224,8 @@ class EurojackpotService
         if ($out) {
             return $out;
         }
-        $lastDraw = $this->loadFilesOnce($folder)['lastDraw'];
+        $loaded = $this->loadFilesOnce($folder);
+        $lastDraw = $loaded['lastDraw'];
 
         if (empty($lastDraw)) {
             return [];
@@ -236,6 +237,7 @@ class EurojackpotService
             'numbers' => [$lastDraw[2], $lastDraw[3], $lastDraw[4], $lastDraw[5], $lastDraw[6]],
             'joker' => [$lastDraw[7], $lastDraw[8]],
             'next_draw_date' => $this->getNextDrawDate(),
+            'prizes' => $loaded['lastDrawPrizes'],
         ];
     }
 
@@ -250,6 +252,7 @@ class EurojackpotService
         $finalStatistics = [];
         $history = [];
         $lastDraw = [];
+        $lastDrawPrizes = [];
         $lastDrawDate = null;
         foreach ($files as $file) {
             try {
@@ -302,6 +305,7 @@ class EurojackpotService
 
                     if (is_null($lastDrawDate) || $lastDrawDate->lt($date)) {
                         $lastDraw = $row;
+                        $lastDrawPrizes = PrizeTiers::parse(array_slice($rows, 0, 3), $row);
                         $lastDrawDate = $date;
                     }
                 }
@@ -322,7 +326,7 @@ class EurojackpotService
         $delays = $history
             ->map(fn ($draw) => ['date' => $draw['date'], 'numbers' => $draw['numbers'], 'jokers' => $draw['jokers']]);
 
-        return $this->loadedFiles[$folder] = ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
+        return $this->loadedFiles[$folder] = ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'lastDrawPrizes' => $lastDrawPrizes, 'delays' => $delays];
     }
 
     /**

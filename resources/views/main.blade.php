@@ -3,7 +3,7 @@
 @section('content')
     <div class="grid gap-8 md:grid-cols-3 items-stretch">
         <!-- Eurozahlen Section -->
-        <div class="flex flex-col mb-8 md:mb-0">
+        <div class="flex flex-col mb-8 md:mb-0" x-data="{ prizesOpen: false }">
             <header class="text-center mb-3">
                 <img src="{{ asset('img/eurojackpot.jpg') }}" alt="{{ __(':game Logo', ['game' => 'Eurojackpot']) }}"
                     class="mx-auto">
@@ -14,6 +14,8 @@
                     @else
                         <div>{{ __('Next Draw:') }} {{ $euro['next_draw_date'] }}</div>
                     @endif
+                    <button type="button" @click="prizesOpen = true"
+                        class="mt-2 text-sm text-blue-400 hover:text-blue-300 underline underline-offset-4">{{ __('Winners & prizes') }}</button>
                 </div>
             </header>
 
@@ -37,10 +39,12 @@
                     </div>
                 </div>
             </div>
+
+            @include('partials.prizes_modal', ['draw' => $euro, 'game' => 'Eurojackpot'])
         </div>
 
         <!-- Joker Section -->
-        <div class="flex flex-col mb-8 md:mb-0">
+        <div class="flex flex-col mb-8 md:mb-0" x-data="{ prizesOpen: false }">
             <header class="text-center mb-3">
                 <img src="{{ asset('img/tzoker.jpg') }}" alt="{{ __(':game Logo', ['game' => 'Joker']) }}" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
@@ -50,6 +54,8 @@
                     @else
                         <div>{{ __('Next Draw:') }} {{ $joker['next_draw_date'] }}</div>
                     @endif
+                    <button type="button" @click="prizesOpen = true"
+                        class="mt-2 text-sm text-blue-400 hover:text-blue-300 underline underline-offset-4">{{ __('Winners & prizes') }}</button>
                 </div>
             </header>
 
@@ -73,10 +79,12 @@
                     </div>
                 </div>
             </div>
+
+            @include('partials.prizes_modal', ['draw' => $joker, 'game' => 'Joker'])
         </div>
 
         <!-- Lotto Section -->
-        <div class="flex flex-col mb-8 md:mb-0">
+        <div class="flex flex-col mb-8 md:mb-0" x-data="{ prizesOpen: false }">
             <header class="text-center mb-3">
                 <img src="{{ asset('img/lotto.jpg') }}" alt="{{ __(':game Logo', ['game' => 'Lotto']) }}" class="mx-auto">
                 <div class="mt-4 text-slate-400 font-medium">
@@ -86,6 +94,8 @@
                     @else
                         <div>{{ __('Next Draw:') }} {{ $lotto['next_draw_date'] }}</div>
                     @endif
+                    <button type="button" @click="prizesOpen = true"
+                        class="mt-2 text-sm text-blue-400 hover:text-blue-300 underline underline-offset-4">{{ __('Winners & prizes') }}</button>
                 </div>
             </header>
 
@@ -99,6 +109,8 @@
                     @endforeach
                 </div>
             </div>
+
+            @include('partials.prizes_modal', ['draw' => $lotto, 'game' => 'Lotto'])
         </div>
     </div>
     <div style="margin-bottom: 10px;margin-top: 20px;">

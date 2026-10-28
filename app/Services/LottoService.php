@@ -200,7 +200,8 @@ class LottoService
         if ($out) {
             return $out;
         }
-        $lastDraw = $this->loadFilesOnce($folder)['lastDraw'];
+        $loaded = $this->loadFilesOnce($folder);
+        $lastDraw = $loaded['lastDraw'];
 
         if (empty($lastDraw)) {
             return [];
@@ -212,6 +213,7 @@ class LottoService
             'numbers' => [$lastDraw[2], $lastDraw[3], $lastDraw[4], $lastDraw[5], $lastDraw[6], $lastDraw[7]],
             'joker' => [],
             'next_draw_date' => $this->getNextDrawDate(),
+            'prizes' => $loaded['lastDrawPrizes'],
         ];
     }
 
@@ -227,6 +229,7 @@ class LottoService
         $finalStatistics = [];
         $stats = [];
         $lastDraw = [];
+        $lastDrawPrizes = [];
         $lastDrawDate = null;
         $delays = [];
         foreach ($files as $file) {
@@ -273,6 +276,7 @@ class LottoService
 
                     if (is_null($lastDrawDate) || $lastDrawDate->lt($date)) {
                         $lastDraw = $row;
+                        $lastDrawPrizes = PrizeTiers::parse(array_slice($rows, 0, 4), $row);
                         $lastDrawDate = $date;
                     }
                 }
@@ -284,7 +288,7 @@ class LottoService
             ->sortByDesc(fn ($delay) => $delay['date'])
             ->values();
 
-        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
+        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'lastDrawPrizes' => $lastDrawPrizes, 'delays' => $delays];
     }
 
     /**

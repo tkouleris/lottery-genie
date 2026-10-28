@@ -186,7 +186,8 @@ class JokerService
         if ($out) {
             return $out;
         }
-        $lastDraw = $this->loadFilesOnce($folder)['lastDraw'];
+        $loaded = $this->loadFilesOnce($folder);
+        $lastDraw = $loaded['lastDraw'];
 
         if (empty($lastDraw)) {
             return [];
@@ -198,6 +199,7 @@ class JokerService
             'numbers' => [$lastDraw[2], $lastDraw[3], $lastDraw[4], $lastDraw[5], $lastDraw[6]],
             'joker' => [$lastDraw[7]],
             'next_draw_date' => $this->getNextDrawDate(),
+            'prizes' => $loaded['lastDrawPrizes'],
         ];
     }
 
@@ -212,6 +214,7 @@ class JokerService
         $finalStatistics = [];
         $stats = [];
         $lastDraw = [];
+        $lastDrawPrizes = [];
         $lastDrawDate = null;
         $delays = [];
         foreach ($files as $file) {
@@ -262,6 +265,7 @@ class JokerService
 
                     if (is_null($lastDrawDate) || $lastDrawDate->lt($date)) {
                         $lastDraw = $row;
+                        $lastDrawPrizes = PrizeTiers::parse(array_slice($rows, 0, 3), $row);
                         $lastDrawDate = $date;
                     }
                 }
@@ -273,7 +277,7 @@ class JokerService
             ->sortByDesc(fn ($delay) => $delay['date'])
             ->values();
 
-        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'delays' => $delays];
+        return ['draws' => $finalStatistics, 'stats' => $stats, 'lastDraw' => $lastDraw, 'lastDrawPrizes' => $lastDrawPrizes, 'delays' => $delays];
     }
 
     /**
